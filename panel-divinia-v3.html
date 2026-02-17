@@ -975,13 +975,13 @@ const SUPABASE_CONFIG = {
   url: localStorage.getItem('divinia_supabase_url') || '',
   key: localStorage.getItem('divinia_supabase_key') || ''
 };
-let supabase = null;
+let sbClient = null;
 let supabaseReady = false;
 
 function initSupabase() {
   if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.key && window.supabase_js) {
     try {
-      supabase = window.supabase_js.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+      sbClient = window.supabase_js.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
       supabaseReady = true;
       document.querySelector('#chat-wa-status .dot').className = 'dot online';
       document.querySelector('#chat-wa-status span:nth-child(2)').innerHTML = 'Supabase: Conectado <span class="cerebro-badge" style="margin-left:8px">✓ Cloud</span>';
@@ -1016,7 +1016,14 @@ function saveSupabaseConfig() {
   localStorage.setItem('divinia_supabase_key', key);
   SUPABASE_CONFIG.url = url;
   SUPABASE_CONFIG.key = key;
-  initSupabase();
+  if (!window.supabase_js) {
+    import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(module => {
+      window.supabase_js = module;
+      initSupabase();
+    });
+  } else {
+    initSupabase();
+  }
   closeModal();
   toast('Supabase configurado','success');
 }
@@ -1026,7 +1033,7 @@ async function migrateToSupabase() {
   const localDB = loadDB();
   for (const t of ['clientes','proyectos','tareas','movimientos','departamentos']) {
     if (localDB[t]?.length) {
-      const { error } = await supabase.from(t).upsert(localDB[t]);
+      const { error } = await sbClient.from(t).upsert(localDB[t]);
       if (error) console.warn('Migration error for ' + t, error);
     }
   }
@@ -1329,12 +1336,12 @@ document.getElementById('topbar-date').textContent = new Date().toLocaleDateStri
 loadChat();
 renderDashboard();
 
-// Try to init Supabase if configured
+// Try to init Supabase if configured (ESM import to avoid var conflict)
 if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.key) {
-  const sbScript = document.createElement('script');
-  sbScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-  sbScript.onload = () => { window.supabase_js = window.supabase; initSupabase(); };
-  document.head.appendChild(sbScript);
+  import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(module => {
+    window.supabase_js = module;
+    initSupabase();
+  }).catch(e => console.warn('Supabase CDN load error:', e));
 }
 </script>
 </body>
