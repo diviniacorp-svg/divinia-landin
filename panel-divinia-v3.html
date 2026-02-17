@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIVINIA OS — Centro de Operaciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#060708;--bg2:#0C0E14;--bg3:#12141D;--bg4:#1A1D2B;
+--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+--text:#F0F0F5;--text2:#8B8D9E;--text3:#5A5C6E;
+--violet:#8B5CF6;--cyan:#06D6A0;--red:#EF4444;--yellow:#F59E0B;--blue:#3B82F6;--green:#10B981;--orange:#F97316;
+--grad:linear-gradient(135deg,#8B5CF6,#06D6A0);
+--font:'Sora',sans-serif;--body:'DM Sans',sans-serif;
+}
+body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .3s}
+.sidebar-logo{display:flex;align-items:center;gap:12px;padding:20px;border-bottom:1px solid var(--border)}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-family:var(--font);font-weight:800;font-size:16px;color:#fff}
+.logo-text{font-family:var(--font);font-weight:700;font-size:17px;letter-spacing:-0.5px}
+.logo-ver{font-size:10px;color:var(--cyan);background:rgba(6,214,160,0.1);border:1px solid rgba(6,214,160,0.2);padding:2px 8px;border-radius:100px;font-weight:600;margin-left:4px}
+.sidebar nav{flex:1;padding:12px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .2s;border:1px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(139,92,246,0.1);color:var(--violet);border-color:rgba(139,92,246,0.2);font-weight:600}
+.nav-item .icon{font-size:16px;width:20px;text-align:center}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:16px 12px 6px;font-weight:600}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);text-align:center}
+
+/* MAIN */
+.main{margin-left:240px;flex:1;min-height:100vh;padding:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:40}
+.topbar h1{font-family:var(--font);font-size:18px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-date{font-size:12px;color:var(--text2)}
+.topbar-user{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:8px;background:var(--bg3);font-size:12px;font-weight:500}
+.content{padding:24px 28px}
+.section{display:none}
+.section.active{display:block}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.kpi-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.kpi-value{font-family:var(--font);font-size:28px;font-weight:700;margin-bottom:4px}
+.kpi-sub{font-size:11px;color:var(--text3)}
+.kpi-card.highlight{border-color:rgba(139,92,246,0.3);background:linear-gradient(135deg,rgba(139,92,246,0.05),rgba(6,214,160,0.05))}
+
+/* CARDS & GRIDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-family:var(--font);font-size:14px;font-weight:600}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text);transition:all .2s;font-family:var(--body);display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--border2);background:var(--bg4)}
+.btn-primary{background:var(--violet);border-color:var(--violet);color:#fff}
+.btn-primary:hover{opacity:0.9}
+.btn-success{background:var(--green);border-color:var(--green);color:#fff}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-danger{background:var(--red);border-color:var(--red);color:#fff}
+
+/* TABLES */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);border-bottom:1px solid var(--border);font-weight:600}
+td{padding:10px 12px;border-bottom:1px solid var(--border)}
+tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.badge-nuevo{background:rgba(59,130,246,0.15);color:var(--blue)}
+.badge-contactado{background:rgba(249,115,22,0.15);color:var(--orange)}
+.badge-propuesta{background:rgba(139,92,246,0.15);color:var(--violet)}
+.badge-negociacion{background:rgba(245,158,11,0.15);color:var(--yellow)}
+.badge-cerrado{background:rgba(16,185,129,0.15);color:var(--green)}
+.badge-activo{background:rgba(6,214,160,0.15);color:var(--cyan)}
+.badge-en_desarrollo{background:rgba(139,92,246,0.15);color:var(--violet)}
+.badge-aprobado{background:rgba(59,130,246,0.15);color:var(--blue)}
+.badge-revision{background:rgba(245,158,11,0.15);color:var(--yellow)}
+.badge-entregado{background:rgba(16,185,129,0.15);color:var(--green)}
+.badge-soporte{background:rgba(6,214,160,0.15);color:var(--cyan)}
+
+/* SCORE BAR */
+.score-bar{width:60px;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px}
+.score-fill{height:100%;border-radius:3px;transition:width .3s}
+
+/* PROGRESS BAR */
+.progress-bar{width:100%;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;background:var(--grad);border-radius:4px;transition:width .5s}
+
+/* MODAL */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px;width:90%;max-width:520px;max-height:85vh;overflow-y:auto}
+.modal h2{font-family:var(--font);font-size:18px;margin-bottom:20px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11px;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:var(--body)}
+.form-group textarea{resize:vertical;min-height:60px}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--violet)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* AGENDA */
+.task-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;border:1px solid var(--border);margin-bottom:8px;transition:all .2s}
+.task-item:hover{border-color:var(--border2)}
+.task-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.task-check:hover{border-color:var(--violet)}
+.task-item.done .task-check{background:var(--green);border-color:var(--green)}
+.task-item.done .task-check::after{content:'✓';color:#fff;font-size:12px}
+.task-item.done .task-text{text-decoration:line-through;opacity:0.5}
+.task-text{flex:1;font-size:13px}
+.task-meta{font-size:11px;color:var(--text3);display:flex;gap:8px;align-items:center}
+.task-delete{cursor:pointer;opacity:0.3;transition:opacity .2s;font-size:14px}
+.task-delete:hover{opacity:1;color:var(--red)}
+.priority-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.priority-alta{background:var(--red)}
+.priority-media{background:var(--yellow)}
+.priority-baja{background:var(--text3)}
+
+/* FINANCE */
+.finance-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+.finance-card{padding:20px;border-radius:12px;border:1px solid var(--border)}
+.finance-card.ingresos{background:rgba(16,185,129,0.05);border-color:rgba(16,185,129,0.2)}
+.finance-card.gastos{background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.2)}
+.finance-card.balance{background:rgba(139,92,246,0.05);border-color:rgba(139,92,246,0.2)}
+.finance-amount{font-family:var(--font);font-size:24px;font-weight:700;margin:8px 0 4px}
+.finance-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
+
+/* DEPT GRID */
+.dept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.dept-card{padding:16px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;gap:12px}
+.dept-icon{font-size:20px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--bg3)}
+.dept-info{flex:1}
+.dept-name{font-size:12px;font-weight:600;margin-bottom:2px}
+.dept-status{font-size:10px}
+.dept-toggle{width:40px;height:22px;border-radius:11px;cursor:pointer;border:none;position:relative;transition:all .3s}
+.dept-toggle.on{background:var(--green)}
+.dept-toggle.off{background:var(--bg4)}
+.dept-toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;transition:left .3s}
+.dept-toggle.on::after{left:21px}
+.dept-toggle.off::after{left:3px}
+
+/* TIMELINE */
+.timeline-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+.timeline-dot{width:8px;height:8px;border-radius:50%;background:var(--violet);margin-top:5px;flex-shrink:0}
+.timeline-text{font-size:12px;color:var(--text2)}
+.timeline-text strong{color:var(--text);font-weight:500}
+.timeline-time{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.empty-state .icon{font-size:32px;margin-bottom:8px;display:block}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-bar select{padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg4);border:1px solid var(--border2);padding:12px 20px;border-radius:10px;font-size:13px;z-index:200;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(16,185,129,0.4)}
+.toast.error{border-color:rgba(239,68,68,0.4)}
+
+/* MOBILE */
+.menu-toggle{display:none;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer}
+@media(max-width:768px){
+.sidebar{transform:translateX(-100%)}
+.sidebar.open{transform:translateX(0)}
+.main{margin-left:0}
+.menu-toggle{display:block}
+.kpi-grid{grid-template-columns:1fr 1fr}
+.grid-2,.grid-3,.finance-summary{grid-template-columns:1fr}
+.dept-grid{grid-template-columns:1fr 1fr}
+.form-row{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+.kpi-grid{grid-template-columns:1fr}
+.dept-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-logo">
+<div class="logo-mark">D</div>
+<div><span class="logo-text">DIVINIA</span><span class="logo-ver">OS v3</span></div>
+</div>
+<nav>
+<div class="nav-label">Principal</div>
+<div class="nav-item active" onclick="showSection('dashboard')"><span class="icon">📊</span> Dashboard</div>
+<div class="nav-item" onclick="showSection('clientes')"><span class="icon">👥</span> CRM / Clientes</div>
+<div class="nav-item" onclick="showSection('proyectos')"><span class="icon">🚀</span> Proyectos</div>
+<div class="nav-item" onclick="showSection('agenda')"><span class="icon">📋</span> Agenda de Joaco</div>
+<div class="nav-label">Gestión</div>
+<div class="nav-item" onclick="showSection('finanzas')"><span class="icon">💰</span> Finanzas</div>
+<div class="nav-item" onclick="showSection('departamentos')"><span class="icon">🏢</span> Departamentos</div>
+<div class="nav-label">Recursos</div>
+<div class="nav-item" onclick="showSection('catalogo')"><span class="icon">📦</span> Catálogo</div>
+</nav>
+<div class="sidebar-footer">DIVINIA © 2026 — San Luis, Argentina</div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:12px">
+<button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+<h1 id="page-title">Dashboard</h1>
+</div>
+<div class="topbar-right">
+<span class="topbar-date" id="topbar-date"></span>
+<div class="topbar-user">👤 Joaco — CEO</div>
+</div>
+</div>
+<div class="content">
+
+<!-- ====== DASHBOARD ====== -->
+<div class="section active" id="sec-dashboard">
+<div class="kpi-grid" id="kpi-grid"></div>
+<div class="grid-2">
+<div class="card">
+<div class="card-header"><span class="card-title">Proyectos Activos</span></div>
+<div id="dash-projects"></div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-title">Actividad Reciente</span></div>
+<div id="dash-timeline"></div>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-title">Acciones Rápidas</span></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn btn-primary" onclick="openModal('cliente')">+ Nuevo Cliente</button>
+<button class="btn btn-primary" onclick="openModal('proyecto')">+ Nuevo Proyecto</button>
+<button class="btn" onclick="openModal('tarea')">+ Tarea para Joaco</button>
+<button class="btn" onclick="openModal('movimiento')">+ Registrar Pago</button>
+</div>
+</div>
+</div>
+
+<!-- ====== CRM / CLIENTES ====== -->
+<div class="section" id="sec-clientes">
+<div class="filter-bar">
+<button class="btn btn-primary" onclick="openModal('cliente')">+ Nuevo Cliente</button>
+<select id="filter-estado-cliente" onchange="renderClientes()">
+<option value="">Todos los estados</option>
+<option value="nuevo">Nuevo</option>
+<option value="contactado">Contactado</option>
+<option value="propuesta">Propuesta</option>
+<option value="negociacion">Negociación</option>
+<option value="cerrado">Cerrado</option>
+<option value="activo">Activo</option>
+</select>
+<select id="filter-rubro" onchange="renderClientes()">
+<option value="">Todos los rubros</option>
+</select>
+</div>
+<div class="card">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Cliente</th><th>Empresa</th><th>Rubro</th><th>Estado</th><th>Score</th><th>Contacto</th><th>Acciones</th></tr></thead>
+<tbody id="clientes-table"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ====== PROYECTOS ====== -->
+<div class="section" id="sec-proyectos">
+<div class="filter-bar">
+<button class="btn btn-primary" onclick="openModal('proyecto')">+ Nuevo Proyecto</button>
+<select id="filter-estado-proyecto" onchange="renderProyectos()">
+<option value="">Todos los estados</option>
+<option value="propuesta">Propuesta</option>
+<option value="aprobado">Aprobado</option>
+<option value="en_desarrollo">En Desarrollo</option>
+<option value="revision">Revisión</option>
+<option value="entregado">Entregado</option>
+<option value="soporte">Soporte</option>
+</select>
+</div>
+<div id="proyectos-list"></div>
+</div>
+
+<!-- ====== AGENDA ====== -->
+<div class="section" id="sec-agenda">
+<div class="filter-bar">
+<button class="btn btn-primary" onclick="openModal('tarea')">+ Nueva Tarea</button>
+<button class="btn btn-sm" onclick="filterTareas('todas')">Todas</button>
+<button class="btn btn-sm" onclick="filterTareas('pendientes')">Pendientes</button>
+<button class="btn btn-sm" onclick="filterTareas('completadas')">Completadas</button>
+</div>
+<div class="grid-2">
+<div class="card">
+<div class="card-header"><span class="card-title">📅 Tareas de Hoy</span></div>
+<div id="tareas-hoy"></div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-title">📌 Pendientes Generales</span></div>
+<div id="tareas-pendientes"></div>
+</div>
+</div>
+</div>
+
+<!-- ====== FINANZAS ====== -->
+<div class="section" id="sec-finanzas">
+<div class="finance-summary" id="finance-summary"></div>
+<div class="filter-bar">
+<button class="btn btn-primary" onclick="openModal('movimiento')">+ Nuevo Movimiento</button>
+</div>
+<div class="card">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Cliente</th><th>Monto</th><th>Acciones</th></tr></thead>
+<tbody id="finanzas-table"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ====== DEPARTAMENTOS ====== -->
+<div class="section" id="sec-departamentos">
+<div class="dept-grid" id="dept-grid"></div>
+</div>
+
+<!-- ====== CATÁLOGO ====== -->
+<div class="section" id="sec-catalogo">
+<div class="grid-3" id="catalogo-grid"></div>
+</div>
+
+</div><!-- content -->
+</div><!-- main -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+<div class="modal" id="modal-content"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA LAYER — localStorage persistence
+// ============================================================
+const DB_KEY = 'divinia_os_v3';
+
+function loadDB() {
+  const raw = localStorage.getItem(DB_KEY);
+  if (raw) return JSON.parse(raw);
+  return getDefaultData();
+}
+
+function saveDB(db) {
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+}
+
+function getDefaultData() {
+  return {
+    clientes: [
+      { id: 1, nombre: "Ediro", empresa: "Secretaría de Transporte — Gob. de San Luis", rubro: "Gobierno", telefono: "", email: "", estado: "activo", score: 95, fechaAlta: "2026-02-17", notas: "Primer cliente. Contacto directo. Múltiples proyectos potenciales." }
+    ],
+    proyectos: [
+      { id: 1, clienteId: 1, nombre: "TUBI — WebApp Bicicletas Públicas", servicio: "Web App Completa", precio: 500000, estado: "en_desarrollo", progreso: 60, deadline: "2026-03-15", notas: "PHP + Gemini AI. 5 roles (admin, alumno, escuela, proveedor, tutor). Gamificación. Falta: DB real, auth persistente, exports." }
+    ],
+    tareas: [
+      { id: 1, texto: "Revisar avance de TUBI con Ediro", prioridad: "alta", categoria: "reunión", fecha: "2026-02-18", done: false },
+      { id: 2, texto: "Configurar monotributo en AFIP para DIVINIA", prioridad: "alta", categoria: "trámite", fecha: "2026-02-19", done: false },
+      { id: 3, texto: "Publicar landing de DIVINIA en redes sociales", prioridad: "media", categoria: "aprobación", fecha: "2026-02-18", done: false },
+      { id: 4, texto: "Buscar 10 leads nuevos en Google Maps San Luis", prioridad: "media", categoria: "llamada", fecha: "2026-02-18", done: false },
+      { id: 5, texto: "Testear landing en mobile y corregir bugs", prioridad: "baja", categoria: "deploy", fecha: "2026-02-17", done: true }
+    ],
+    movimientos: [
+      { id: 1, tipo: "gasto", concepto: "Claude API — Anthropic", monto: 20, moneda: "USD", clienteId: null, fecha: "2026-02-17" }
+    ],
+    departamentos: [
+      { id: 1, nombre: "IA & Automatizaciones", icono: "🤖", activo: true },
+      { id: 2, nombre: "Web & Apps", icono: "💻", activo: true },
+      { id: 3, nombre: "YouTube & Multimedia", icono: "🎬", activo: false },
+      { id: 4, nombre: "Content Factory", icono: "📝", activo: false },
+      { id: 5, nombre: "Clientes & Servicios", icono: "🤝", activo: true },
+      { id: 6, nombre: "Avatares IA", icono: "🧑‍💼", activo: false },
+      { id: 7, nombre: "Legal & Compliance", icono: "⚖️", activo: false },
+      { id: 8, nombre: "Ciberseguridad", icono: "🔒", activo: false },
+      { id: 9, nombre: "Contabilidad & Finanzas", icono: "📊", activo: true },
+      { id: 10, nombre: "RRHH Digital", icono: "👥", activo: false },
+      { id: 11, nombre: "Innovación", icono: "💡", activo: false }
+    ],
+    timeline: [
+      { texto: "DIVINIA OS v3.0 activado", fecha: "2026-02-17 10:00" },
+      { texto: "Landing page desplegada en Vercel", fecha: "2026-02-17 11:00" },
+      { texto: "WhatsApp corregido en GitHub", fecha: "2026-02-17 15:00" },
+      { texto: "Cliente <strong>Ediro</strong> registrado — Secretaría de Transporte", fecha: "2026-02-17 16:00" },
+      { texto: "Proyecto <strong>TUBI</strong> registrado — en desarrollo", fecha: "2026-02-17 16:00" }
+    ],
+    nextId: { clientes: 2, proyectos: 2, tareas: 6, movimientos: 2 }
+  };
+}
+
+let DB = loadDB();
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+const titles = {
+  dashboard: "Dashboard",
+  clientes: "CRM / Clientes",
+  proyectos: "Proyectos",
+  agenda: "Agenda de Joaco",
+  finanzas: "Finanzas",
+  departamentos: "Departamentos",
+  catalogo: "Catálogo de Servicios"
+};
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  document.getElementById('page-title').textContent = titles[id] || id;
+  // Mark nav active
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.trim().includes(titles[id]?.split('/')[0]?.trim() || '---')) n.classList.add('active');
+  });
+  // Re-render section
+  const renders = { dashboard: renderDashboard, clientes: renderClientes, proyectos: renderProyectos, agenda: renderAgenda, finanzas: renderFinanzas, departamentos: renderDepartamentos, catalogo: renderCatalogo };
+  if (renders[id]) renders[id]();
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  const ingresos = DB.movimientos.filter(m => m.tipo === 'ingreso').reduce((s, m) => s + m.monto, 0);
+  const proyActivos = DB.proyectos.filter(p => ['en_desarrollo','revision','aprobado'].includes(p.estado)).length;
+  const leadsCount = DB.clientes.filter(c => ['nuevo','contactado','propuesta','negociacion'].includes(c.estado)).length;
+  const tareasPend = DB.tareas.filter(t => !t.done).length;
+
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi-card highlight"><div class="kpi-label">Ingresos del Mes</div><div class="kpi-value" style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$${formatMoney(ingresos)}</div><div class="kpi-sub">ARS — Febrero 2026</div></div>
+    <div class="kpi-card"><div class="kpi-label">Proyectos Activos</div><div class="kpi-value">${proyActivos}</div><div class="kpi-sub">${DB.proyectos.length} totales</div></div>
+    <div class="kpi-card"><div class="kpi-label">Leads en Pipeline</div><div class="kpi-value">${leadsCount}</div><div class="kpi-sub">${DB.clientes.length} clientes totales</div></div>
+    <div class="kpi-card"><div class="kpi-label">Tareas Pendientes</div><div class="kpi-value">${tareasPend}</div><div class="kpi-sub">${DB.tareas.filter(t=>t.done).length} completadas</div></div>
+  `;
+
+  // Active projects
+  const activeP = DB.proyectos.filter(p => p.estado !== 'entregado').slice(0, 5);
+  document.getElementById('dash-projects').innerHTML = activeP.length ? activeP.map(p => {
+    const cli = DB.clientes.find(c => c.id === p.clienteId);
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong style="font-size:13px">${p.nombre}</strong><div style="font-size:11px;color:var(--text3)">${cli ? cli.empresa : 'Sin cliente'} — ${formatMoney(p.precio)} ARS</div></div>
+        <span class="badge badge-${p.estado}">${p.estado.replace('_',' ')}</span>
+      </div>
+      <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:${p.progreso}%"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">${p.progreso}% completado — Deadline: ${p.deadline}</div>
+    </div>`;
+  }).join('') : '<div class="empty-state"><span class="icon">🚀</span>No hay proyectos activos</div>';
+
+  // Timeline
+  document.getElementById('dash-timeline').innerHTML = DB.timeline.slice(-8).reverse().map(t => `
+    <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-text">${t.texto}</div><div class="timeline-time">${t.fecha}</div></div></div>
+  `).join('');
+}
+
+// ============================================================
+// CRM / CLIENTES
+// ============================================================
+function renderClientes() {
+  const estadoF = document.getElementById('filter-estado-cliente').value;
+  const rubroF = document.getElementById('filter-rubro').value;
+  let list = DB.clientes;
+  if (estadoF) list = list.filter(c => c.estado === estadoF);
+  if (rubroF) list = list.filter(c => c.rubro === rubroF);
+  // Update rubro filter options
+  const rubros = [...new Set(DB.clientes.map(c => c.rubro))];
+  const rubroSel = document.getElementById('filter-rubro');
+  const currentRubro = rubroSel.value;
+  rubroSel.innerHTML = '<option value="">Todos los rubros</option>' + rubros.map(r => `<option value="${r}" ${r===currentRubro?'selected':''}>${r}</option>`).join('');
+
+  document.getElementById('clientes-table').innerHTML = list.length ? list.map(c => {
+    const scoreColor = c.score >= 80 ? 'var(--green)' : c.score >= 50 ? 'var(--yellow)' : 'var(--red)';
+    return `<tr>
+      <td><strong>${c.nombre}</strong></td>
+      <td style="font-size:12px">${c.empresa}</td>
+      <td><span class="badge badge-propuesta">${c.rubro}</span></td>
+      <td><span class="badge badge-${c.estado}">${c.estado}</span></td>
+      <td><div class="score-bar"><div class="score-fill" style="width:${c.score}%;background:${scoreColor}"></div></div>${c.score}</td>
+      <td style="font-size:12px">${c.telefono || c.email || '—'}</td>
+      <td><button class="btn btn-sm" onclick="editCliente(${c.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteCliente(${c.id})">🗑</button></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="7" class="empty-state"><span class="icon">👥</span>No hay clientes. ¡Agregá el primero!</td></tr>';
+}
+
+function editCliente(id) { openModal('cliente', id); }
+function deleteCliente(id) {
+  if (!confirm('¿Eliminar este cliente?')) return;
+  DB.clientes = DB.clientes.filter(c => c.id !== id);
+  saveDB(DB); renderClientes(); toast('Cliente eliminado','success');
+}
+
+// ============================================================
+// PROYECTOS
+// ============================================================
+function renderProyectos() {
+  const estadoF = document.getElementById('filter-estado-proyecto').value;
+  let list = DB.proyectos;
+  if (estadoF) list = list.filter(p => p.estado === estadoF);
+
+  document.getElementById('proyectos-list').innerHTML = list.length ? list.map(p => {
+    const cli = DB.clientes.find(c => c.id === p.clienteId);
+    return `<div class="card" style="margin-bottom:16px">
+      <div class="card-header">
+        <div>
+          <span class="card-title">${p.nombre}</span>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">${cli ? cli.empresa : 'Sin cliente'}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge badge-${p.estado}">${p.estado.replace('_',' ')}</span>
+          <button class="btn btn-sm" onclick="editProyecto(${p.id})">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteProyecto(${p.id})">🗑</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:12px">
+        <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Servicio</div><div style="font-size:13px">${p.servicio}</div></div>
+        <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Precio</div><div style="font-size:13px;font-weight:600">$${formatMoney(p.precio)} ARS</div></div>
+        <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Deadline</div><div style="font-size:13px">${p.deadline}</div></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${p.progreso}%"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:11px;color:var(--text3)">${p.progreso}% completado</span></div>
+      ${p.notas ? `<div style="margin-top:10px;padding:10px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2)">${p.notas}</div>` : ''}
+    </div>`;
+  }).join('') : '<div class="empty-state"><span class="icon">🚀</span>No hay proyectos. ¡Creá el primero!</div>';
+}
+
+function editProyecto(id) { openModal('proyecto', id); }
+function deleteProyecto(id) {
+  if (!confirm('¿Eliminar este proyecto?')) return;
+  DB.proyectos = DB.proyectos.filter(p => p.id !== id);
+  saveDB(DB); renderProyectos(); toast('Proyecto eliminado','success');
+}
+
+// ============================================================
+// AGENDA
+// ============================================================
+let tareaFilter = 'todas';
+function filterTareas(f) { tareaFilter = f; renderAgenda(); }
+
+function renderAgenda() {
+  const hoy = new Date().toISOString().split('T')[0];
+  let tareasHoy = DB.tareas.filter(t => t.fecha === hoy);
+  let tareasPend = DB.tareas.filter(t => t.fecha !== hoy);
+  if (tareaFilter === 'pendientes') { tareasHoy = tareasHoy.filter(t=>!t.done); tareasPend = tareasPend.filter(t=>!t.done); }
+  if (tareaFilter === 'completadas') { tareasHoy = tareasHoy.filter(t=>t.done); tareasPend = tareasPend.filter(t=>t.done); }
+
+  document.getElementById('tareas-hoy').innerHTML = tareasHoy.length ? tareasHoy.map(renderTarea).join('') : '<div class="empty-state"><span class="icon">✅</span>No hay tareas para hoy</div>';
+  document.getElementById('tareas-pendientes').innerHTML = tareasPend.length ? tareasPend.map(renderTarea).join('') : '<div class="empty-state"><span class="icon">📌</span>Sin tareas pendientes</div>';
+}
+
+function renderTarea(t) {
+  return `<div class="task-item ${t.done?'done':''}">
+    <div class="task-check" onclick="toggleTarea(${t.id})"></div>
+    <div class="priority-dot priority-${t.prioridad}"></div>
+    <div style="flex:1">
+      <div class="task-text">${t.texto}</div>
+      <div class="task-meta"><span>${t.categoria}</span><span>${t.fecha}</span></div>
+    </div>
+    <span class="task-delete" onclick="deleteTarea(${t.id})">✕</span>
+  </div>`;
+}
+
+function toggleTarea(id) {
+  const t = DB.tareas.find(t => t.id === id);
+  if (t) { t.done = !t.done; saveDB(DB); renderAgenda(); addTimeline(t.done ? `Tarea completada: <strong>${t.texto}</strong>` : `Tarea reabierta: <strong>${t.texto}</strong>`); }
+}
+
+function deleteTarea(id) {
+  DB.tareas = DB.tareas.filter(t => t.id !== id);
+  saveDB(DB); renderAgenda(); toast('Tarea eliminada','success');
+}
+
+// ============================================================
+// FINANZAS
+// ============================================================
+function renderFinanzas() {
+  const ingresos = DB.movimientos.filter(m => m.tipo === 'ingreso').reduce((s, m) => s + m.monto, 0);
+  const gastos = DB.movimientos.filter(m => m.tipo === 'gasto').reduce((s, m) => s + m.monto, 0);
+
+  document.getElementById('finance-summary').innerHTML = `
+    <div class="finance-card ingresos"><div class="finance-label">Ingresos</div><div class="finance-amount" style="color:var(--green)">$${formatMoney(ingresos)}</div><div style="font-size:11px;color:var(--text3)">ARS — Febrero 2026</div></div>
+    <div class="finance-card gastos"><div class="finance-label">Gastos</div><div class="finance-amount" style="color:var(--red)">$${formatMoney(gastos)}</div><div style="font-size:11px;color:var(--text3)">Suscripciones + APIs</div></div>
+    <div class="finance-card balance"><div class="finance-label">Balance</div><div class="finance-amount" style="color:${ingresos-gastos>=0?'var(--cyan)':'var(--red)'}">$${formatMoney(ingresos - gastos)}</div><div style="font-size:11px;color:var(--text3)">Resultado del mes</div></div>
+  `;
+
+  document.getElementById('finanzas-table').innerHTML = DB.movimientos.length ? DB.movimientos.sort((a,b) => b.fecha.localeCompare(a.fecha)).map(m => {
+    const cli = m.clienteId ? DB.clientes.find(c => c.id === m.clienteId) : null;
+    return `<tr>
+      <td>${m.fecha}</td>
+      <td><span class="badge ${m.tipo==='ingreso'?'badge-activo':'badge-nuevo'}">${m.tipo}</span></td>
+      <td>${m.concepto}</td>
+      <td>${cli ? cli.nombre : '—'}</td>
+      <td style="font-weight:600;color:${m.tipo==='ingreso'?'var(--green)':'var(--red)'}">${m.tipo==='ingreso'?'+':'-'}$${formatMoney(m.monto)} ${m.moneda||'ARS'}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="deleteMovimiento(${m.id})">🗑</button></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="6" class="empty-state">No hay movimientos registrados</td></tr>';
+}
+
+function deleteMovimiento(id) {
+  DB.movimientos = DB.movimientos.filter(m => m.id !== id);
+  saveDB(DB); renderFinanzas(); toast('Movimiento eliminado','success');
+}
+
+// ============================================================
+// DEPARTAMENTOS
+// ============================================================
+function renderDepartamentos() {
+  document.getElementById('dept-grid').innerHTML = DB.departamentos.map(d => `
+    <div class="dept-card">
+      <div class="dept-icon">${d.icono}</div>
+      <div class="dept-info">
+        <div class="dept-name">${d.nombre}</div>
+        <div class="dept-status" style="color:${d.activo?'var(--green)':'var(--text3)'}">${d.activo ? '● Activo' : '○ Standby'}</div>
+      </div>
+      <button class="dept-toggle ${d.activo?'on':'off'}" onclick="toggleDept(${d.id})"></button>
+    </div>
+  `).join('');
+}
+
+function toggleDept(id) {
+  const d = DB.departamentos.find(d => d.id === id);
+  if (d) { d.activo = !d.activo; saveDB(DB); renderDepartamentos(); toast(`${d.nombre}: ${d.activo?'Activado':'Desactivado'}`, 'success'); }
+}
+
+// ============================================================
+// CATÁLOGO
+// ============================================================
+function renderCatalogo() {
+  const servicios = [
+    { cat: "IA & Automatizaciones", items: [
+      { nombre: "Chatbot WhatsApp básico", precio: 150000, tiempo: "48hs" },
+      { nombre: "Chatbot WhatsApp pro", precio: 250000, tiempo: "1 semana" },
+      { nombre: "Automatización de proceso", precio: 120000, tiempo: "2-3 días" },
+      { nombre: "Pack 3 automatizaciones", precio: 300000, tiempo: "1 semana" },
+      { nombre: "CRM automatizado con IA", precio: 400000, tiempo: "2 semanas" },
+      { nombre: "Sistema multi-agente", precio: 800000, tiempo: "2-4 semanas" }
+    ]},
+    { cat: "Web & Apps", items: [
+      { nombre: "Landing page", precio: 100000, tiempo: "24-48hs" },
+      { nombre: "Sitio web completo", precio: 300000, tiempo: "1-2 semanas" },
+      { nombre: "Dashboard / Panel admin", precio: 400000, tiempo: "2-3 semanas" },
+      { nombre: "App móvil", precio: 500000, tiempo: "3-4 semanas" }
+    ]},
+    { cat: "Avatares IA", items: [
+      { nombre: "Avatar corporativo", precio: 200000, tiempo: "1 semana" },
+      { nombre: "Avatar atención al cliente", precio: 150000, tiempo: "1 semana" },
+      { nombre: "Influencer / presentador IA", precio: 300000, tiempo: "2 semanas" },
+      { nombre: "Pack 10 videos con avatar", precio: 100000, tiempo: "1 semana" }
+    ]},
+    { cat: "Content Factory", items: [
+      { nombre: "Pack 30 posts/mes", precio: 80000, tiempo: "Mensual" },
+      { nombre: "Pack 10 posts + 4 videos", precio: 120000, tiempo: "Mensual" },
+      { nombre: "Gestión completa redes", precio: 150000, tiempo: "Mensual" }
+    ]},
+    { cat: "YouTube", items: [
+      { nombre: "Guión + producción 1 video", precio: 50000, tiempo: "3-5 días" },
+      { nombre: "Pack 4 videos/mes", precio: 150000, tiempo: "Mensual" },
+      { nombre: "Canal completo (10 videos)", precio: 400000, tiempo: "1 mes" }
+    ]},
+    { cat: "Mantenimiento", items: [
+      { nombre: "Plan básico", precio: 50000, tiempo: "Mensual" },
+      { nombre: "Plan pro", precio: 100000, tiempo: "Mensual" },
+      { nombre: "Plan enterprise", precio: 200000, tiempo: "Mensual" }
+    ]}
+  ];
+
+  document.getElementById('catalogo-grid').innerHTML = servicios.map(s => `
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px">${s.cat}</div>
+      ${s.items.map(i => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:12px">${i.nombre}</div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:600;color:var(--cyan)">$${formatMoney(i.precio)}</div><div style="font-size:10px;color:var(--text3)">${i.tiempo}</div></div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(type, editId) {
+  const m = document.getElementById('modal-content');
+  let html = '';
+
+  if (type === 'cliente') {
+    const c = editId ? DB.clientes.find(x => x.id === editId) : null;
+    html = `<h2>${c ? 'Editar' : 'Nuevo'} Cliente</h2>
+    <div class="form-row"><div class="form-group"><label>Nombre</label><input id="f-cli-nombre" value="${c?.nombre||''}"></div><div class="form-group"><label>Empresa</label><input id="f-cli-empresa" value="${c?.empresa||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Rubro</label><input id="f-cli-rubro" value="${c?.rubro||''}" placeholder="Ej: Gastronomía, Gobierno..."></div><div class="form-group"><label>Estado</label><select id="f-cli-estado"><option value="nuevo" ${c?.estado==='nuevo'?'selected':''}>Nuevo</option><option value="contactado" ${c?.estado==='contactado'?'selected':''}>Contactado</option><option value="propuesta" ${c?.estado==='propuesta'?'selected':''}>Propuesta</option><option value="negociacion" ${c?.estado==='negociacion'?'selected':''}>Negociación</option><option value="cerrado" ${c?.estado==='cerrado'?'selected':''}>Cerrado</option><option value="activo" ${c?.estado==='activo'?'selected':''}>Activo</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Teléfono</label><input id="f-cli-tel" value="${c?.telefono||''}"></div><div class="form-group"><label>Email</label><input id="f-cli-email" value="${c?.email||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Score (0-100)</label><input id="f-cli-score" type="number" min="0" max="100" value="${c?.score||50}"></div><div class="form-group"><label>Fecha Alta</label><input id="f-cli-fecha" type="date" value="${c?.fechaAlta||new Date().toISOString().split('T')[0]}"></div></div>
+    <div class="form-group"><label>Notas</label><textarea id="f-cli-notas">${c?.notas||''}</textarea></div>
+    <div class="form-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveCliente(${editId||0})">Guardar</button></div>`;
+  }
+
+  if (type === 'proyecto') {
+    const p = editId ? DB.proyectos.find(x => x.id === editId) : null;
+    const cliOptions = DB.clientes.map(c => `<option value="${c.id}" ${p?.clienteId===c.id?'selected':''}>${c.nombre} — ${c.empresa}</option>`).join('');
+    html = `<h2>${p ? 'Editar' : 'Nuevo'} Proyecto</h2>
+    <div class="form-group"><label>Nombre del Proyecto</label><input id="f-proy-nombre" value="${p?.nombre||''}"></div>
+    <div class="form-row"><div class="form-group"><label>Cliente</label><select id="f-proy-cliente"><option value="">Seleccionar...</option>${cliOptions}</select></div><div class="form-group"><label>Servicio</label><input id="f-proy-servicio" value="${p?.servicio||''}" placeholder="Ej: Web App Completa"></div></div>
+    <div class="form-row"><div class="form-group"><label>Precio (ARS)</label><input id="f-proy-precio" type="number" value="${p?.precio||0}"></div><div class="form-group"><label>Deadline</label><input id="f-proy-deadline" type="date" value="${p?.deadline||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Estado</label><select id="f-proy-estado"><option value="propuesta" ${p?.estado==='propuesta'?'selected':''}>Propuesta</option><option value="aprobado" ${p?.estado==='aprobado'?'selected':''}>Aprobado</option><option value="en_desarrollo" ${p?.estado==='en_desarrollo'?'selected':''}>En Desarrollo</option><option value="revision" ${p?.estado==='revision'?'selected':''}>Revisión</option><option value="entregado" ${p?.estado==='entregado'?'selected':''}>Entregado</option><option value="soporte" ${p?.estado==='soporte'?'selected':''}>Soporte</option></select></div><div class="form-group"><label>Progreso (%)</label><input id="f-proy-progreso" type="number" min="0" max="100" value="${p?.progreso||0}"></div></div>
+    <div class="form-group"><label>Notas</label><textarea id="f-proy-notas">${p?.notas||''}</textarea></div>
+    <div class="form-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveProyecto(${editId||0})">Guardar</button></div>`;
+  }
+
+  if (type === 'tarea') {
+    html = `<h2>Nueva Tarea</h2>
+    <div class="form-group"><label>Descripción</label><input id="f-tarea-texto" placeholder="¿Qué tiene que hacer Joaco?"></div>
+    <div class="form-row"><div class="form-group"><label>Prioridad</label><select id="f-tarea-prioridad"><option value="alta">🔴 Alta</option><option value="media" selected>🟡 Media</option><option value="baja">⚪ Baja</option></select></div><div class="form-group"><label>Categoría</label><select id="f-tarea-cat"><option value="reunión">Reunión</option><option value="trámite">Trámite</option><option value="aprobación">Aprobación</option><option value="llamada">Llamada</option><option value="deploy">Deploy</option></select></div></div>
+    <div class="form-group"><label>Fecha</label><input id="f-tarea-fecha" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+    <div class="form-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveTarea()">Guardar</button></div>`;
+  }
+
+  if (type === 'movimiento') {
+    const cliOptions = DB.clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+    html = `<h2>Nuevo Movimiento</h2>
+    <div class="form-row"><div class="form-group"><label>Tipo</label><select id="f-mov-tipo"><option value="ingreso">Ingreso</option><option value="gasto">Gasto</option></select></div><div class="form-group"><label>Monto</label><input id="f-mov-monto" type="number" value="0"></div></div>
+    <div class="form-row"><div class="form-group"><label>Concepto</label><input id="f-mov-concepto" placeholder="Ej: Pago adelanto TUBI"></div><div class="form-group"><label>Cliente (opcional)</label><select id="f-mov-cliente"><option value="">Ninguno</option>${cliOptions}</select></div></div>
+    <div class="form-row"><div class="form-group"><label>Moneda</label><select id="f-mov-moneda"><option value="ARS">ARS</option><option value="USD">USD</option></select></div><div class="form-group"><label>Fecha</label><input id="f-mov-fecha" type="date" value="${new Date().toISOString().split('T')[0]}"></div></div>
+    <div class="form-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveMovimiento()">Guardar</button></div>`;
+  }
+
+  m.innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
+
+// ============================================================
+// SAVE FUNCTIONS
+// ============================================================
+function saveCliente(editId) {
+  const data = {
+    nombre: document.getElementById('f-cli-nombre').value.trim(),
+    empresa: document.getElementById('f-cli-empresa').value.trim(),
+    rubro: document.getElementById('f-cli-rubro').value.trim(),
+    estado: document.getElementById('f-cli-estado').value,
+    telefono: document.getElementById('f-cli-tel').value.trim(),
+    email: document.getElementById('f-cli-email').value.trim(),
+    score: parseInt(document.getElementById('f-cli-score').value) || 50,
+    fechaAlta: document.getElementById('f-cli-fecha').value,
+    notas: document.getElementById('f-cli-notas').value.trim()
+  };
+  if (!data.nombre) { toast('El nombre es obligatorio','error'); return; }
+  if (editId) {
+    const c = DB.clientes.find(x => x.id === editId);
+    Object.assign(c, data); addTimeline(`Cliente actualizado: <strong>${data.nombre}</strong>`);
+  } else {
+    data.id = DB.nextId.clientes++;
+    DB.clientes.push(data); addTimeline(`Nuevo cliente: <strong>${data.nombre}</strong> — ${data.empresa}`);
+  }
+  saveDB(DB); closeModal(); renderClientes(); renderDashboard(); toast('Cliente guardado','success');
+}
+
+function saveProyecto(editId) {
+  const data = {
+    clienteId: parseInt(document.getElementById('f-proy-cliente').value) || null,
+    nombre: document.getElementById('f-proy-nombre').value.trim(),
+    servicio: document.getElementById('f-proy-servicio').value.trim(),
+    precio: parseInt(document.getElementById('f-proy-precio').value) || 0,
+    deadline: document.getElementById('f-proy-deadline').value,
+    estado: document.getElementById('f-proy-estado').value,
+    progreso: parseInt(document.getElementById('f-proy-progreso').value) || 0,
+    notas: document.getElementById('f-proy-notas').value.trim()
+  };
+  if (!data.nombre) { toast('El nombre es obligatorio','error'); return; }
+  if (editId) {
+    const p = DB.proyectos.find(x => x.id === editId);
+    Object.assign(p, data); addTimeline(`Proyecto actualizado: <strong>${data.nombre}</strong>`);
+  } else {
+    data.id = DB.nextId.proyectos++;
+    DB.proyectos.push(data); addTimeline(`Nuevo proyecto: <strong>${data.nombre}</strong>`);
+  }
+  saveDB(DB); closeModal(); renderProyectos(); renderDashboard(); toast('Proyecto guardado','success');
+}
+
+function saveTarea() {
+  const data = {
+    id: DB.nextId.tareas++,
+    texto: document.getElementById('f-tarea-texto').value.trim(),
+    prioridad: document.getElementById('f-tarea-prioridad').value,
+    categoria: document.getElementById('f-tarea-cat').value,
+    fecha: document.getElementById('f-tarea-fecha').value,
+    done: false
+  };
+  if (!data.texto) { toast('La descripción es obligatoria','error'); return; }
+  DB.tareas.push(data); saveDB(DB); closeModal(); renderAgenda(); renderDashboard();
+  addTimeline(`Nueva tarea: <strong>${data.texto}</strong>`); toast('Tarea creada','success');
+}
+
+function saveMovimiento() {
+  const data = {
+    id: DB.nextId.movimientos++,
+    tipo: document.getElementById('f-mov-tipo').value,
+    monto: parseFloat(document.getElementById('f-mov-monto').value) || 0,
+    concepto: document.getElementById('f-mov-concepto').value.trim(),
+    clienteId: parseInt(document.getElementById('f-mov-cliente').value) || null,
+    moneda: document.getElementById('f-mov-moneda').value,
+    fecha: document.getElementById('f-mov-fecha').value
+  };
+  if (!data.concepto) { toast('El concepto es obligatorio','error'); return; }
+  DB.movimientos.push(data); saveDB(DB); closeModal(); renderFinanzas(); renderDashboard();
+  addTimeline(`${data.tipo==='ingreso'?'Ingreso':'Gasto'}: <strong>$${formatMoney(data.monto)} ${data.moneda}</strong> — ${data.concepto}`);
+  toast('Movimiento registrado','success');
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function formatMoney(n) { return n.toLocaleString('es-AR'); }
+
+function addTimeline(texto) {
+  DB.timeline.push({ texto, fecha: new Date().toLocaleString('es-AR') });
+  if (DB.timeline.length > 50) DB.timeline = DB.timeline.slice(-50);
+  saveDB(DB);
+}
+
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type||'');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('es-AR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+renderDashboard();
+</script>
+</body>
+</html>
