@@ -169,6 +169,52 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .toast.success{border-color:rgba(16,185,129,0.4)}
 .toast.error{border-color:rgba(239,68,68,0.4)}
 
+/* CHAT CEO */
+.chat-container{display:flex;height:calc(100vh - 140px);gap:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg2)}
+.chat-list{width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.chat-list-header{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.chat-list-header h3{font-family:var(--font);font-size:14px;font-weight:600}
+.chat-list-items{flex:1;overflow-y:auto}
+.chat-contact{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .2s}
+.chat-contact:hover,.chat-contact.active{background:var(--bg3)}
+.chat-contact.active{border-left:3px solid var(--violet)}
+.chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.chat-contact-info{flex:1;min-width:0}
+.chat-contact-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.chat-contact-preview{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-contact-time{font-size:10px;color:var(--text3)}
+.chat-contact-badge{background:var(--violet);color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700}
+.chat-window{flex:1;display:flex;flex-direction:column}
+.chat-window-header{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2)}
+.chat-window-header .name{font-family:var(--font);font-size:14px;font-weight:600}
+.chat-window-header .status{font-size:11px;color:var(--green)}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:4px;background:var(--bg)}
+.chat-bubble-wrap{display:flex;flex-direction:column;max-width:70%}
+.chat-bubble-wrap.enviado{align-self:flex-end;align-items:flex-end}
+.chat-bubble-wrap.recibido{align-self:flex-start;align-items:flex-start}
+.chat-bubble{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.4;word-wrap:break-word}
+.chat-bubble.enviado{background:var(--violet);color:#fff;border-bottom-right-radius:4px}
+.chat-bubble.recibido{background:var(--bg3);color:var(--text);border-bottom-left-radius:4px}
+.chat-bubble-time{font-size:9px;color:var(--text3);margin-top:2px;padding:0 4px}
+.chat-bubble-wrap.enviado .chat-bubble-time{text-align:right}
+.chat-date-divider{text-align:center;padding:8px 0;font-size:10px;color:var(--text3)}
+.chat-date-divider span{background:var(--bg3);padding:3px 12px;border-radius:10px}
+.chat-input-bar{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;background:var(--bg2)}
+.chat-input-bar input{flex:1;padding:10px 16px;border:1px solid var(--border2);border-radius:20px;background:var(--bg3);color:var(--text);font-size:13px;font-family:var(--body);outline:none}
+.chat-input-bar input:focus{border-color:var(--violet)}
+.chat-input-bar input::placeholder{color:var(--text3)}
+.chat-send-btn{width:38px;height:38px;border-radius:50%;background:var(--violet);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .2s}
+.chat-send-btn:hover{opacity:.85}
+.chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:14px;gap:8px}
+.chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px;border-top:1px solid var(--border);background:var(--bg2)}
+.chat-suggestion{padding:6px 12px;border-radius:16px;border:1px solid var(--border2);background:var(--bg3);font-size:11px;color:var(--text2);cursor:pointer;transition:all .2s}
+.chat-suggestion:hover{background:var(--violet);color:#fff;border-color:var(--violet)}
+.cerebro-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;font-size:10px;font-weight:600;background:rgba(139,92,246,0.15);color:var(--violet)}
+.chat-wa-status{display:flex;align-items:center;gap:6px;padding:8px 16px;font-size:11px;border-bottom:1px solid var(--border)}
+.chat-wa-status .dot{width:8px;height:8px;border-radius:50%}
+.chat-wa-status .dot.online{background:var(--green)}
+.chat-wa-status .dot.offline{background:var(--red)}
+
 /* MOBILE */
 .menu-toggle{display:none;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer}
 @media(max-width:768px){
@@ -180,6 +226,8 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .grid-2,.grid-3,.finance-summary{grid-template-columns:1fr}
 .dept-grid{grid-template-columns:1fr 1fr}
 .form-row{grid-template-columns:1fr}
+.chat-container{flex-direction:column;height:auto}
+.chat-list{width:100%;max-height:200px}
 }
 @media(max-width:480px){
 .kpi-grid{grid-template-columns:1fr}
@@ -193,7 +241,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <aside class="sidebar" id="sidebar">
 <div class="sidebar-logo">
 <div class="logo-mark">D</div>
-<div><span class="logo-text">DIVINIA</span><span class="logo-ver">OS v3</span></div>
+<div><span class="logo-text">DIVINIA</span><span class="logo-ver">OS v3.1</span></div>
 </div>
 <nav>
 <div class="nav-label">Principal</div>
@@ -201,6 +249,8 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="nav-item" onclick="showSection('clientes')"><span class="icon">👥</span> CRM / Clientes</div>
 <div class="nav-item" onclick="showSection('proyectos')"><span class="icon">🚀</span> Proyectos</div>
 <div class="nav-item" onclick="showSection('agenda')"><span class="icon">📋</span> Agenda de Joaco</div>
+<div class="nav-label">Comunicación</div>
+<div class="nav-item" onclick="showSection('chat')"><span class="icon">💬</span> Chat CEO</div>
 <div class="nav-label">Gestión</div>
 <div class="nav-item" onclick="showSection('finanzas')"><span class="icon">💰</span> Finanzas</div>
 <div class="nav-item" onclick="showSection('departamentos')"><span class="icon">🏢</span> Departamentos</div>
@@ -312,6 +362,49 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 </div>
 
+<!-- ====== CHAT CEO ====== -->
+<div class="section" id="sec-chat">
+<div class="chat-wa-status" id="chat-wa-status">
+<span class="dot offline"></span>
+<span>WhatsApp: Desconectado — <a href="#" onclick="showSupabaseConfig()" style="color:var(--violet)">Configurar Supabase + WhatsApp</a></span>
+<span style="margin-left:auto" class="cerebro-badge">🧠 Cerebro v1</span>
+</div>
+<div class="chat-container">
+<div class="chat-list">
+<div class="chat-list-header">
+<h3>Conversaciones</h3>
+<button class="btn btn-sm btn-primary" onclick="openModal('nueva-conversacion')">+</button>
+</div>
+<div class="chat-list-items" id="chat-conversations"></div>
+</div>
+<div class="chat-window" id="chat-window">
+<div class="chat-empty" id="chat-empty">
+<span style="font-size:48px">💬</span>
+<span>Seleccioná una conversación</span>
+<span style="font-size:12px">o creá una nueva para empezar</span>
+</div>
+<div style="display:none;flex-direction:column;height:100%" id="chat-active">
+<div class="chat-window-header">
+<div>
+<div class="name" id="chat-contact-name">—</div>
+<div class="status" id="chat-contact-status">—</div>
+</div>
+<div style="display:flex;gap:6px">
+<button class="btn btn-sm" onclick="vincularClienteChat()">🔗 Vincular</button>
+<button class="btn btn-sm" onclick="openWhatsAppDirect()">📱 Abrir WA</button>
+</div>
+</div>
+<div class="chat-messages" id="chat-messages"></div>
+<div class="chat-suggestions" id="chat-suggestions" style="display:none"></div>
+<div class="chat-input-bar">
+<input type="text" id="chat-input" placeholder="Escribir mensaje..." onkeypress="if(event.key==='Enter')sendMessage()">
+<button class="chat-send-btn" onclick="sendMessage()">➤</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
 <!-- ====== FINANZAS ====== -->
 <div class="section" id="sec-finanzas">
 <div class="finance-summary" id="finance-summary"></div>
@@ -419,7 +512,8 @@ const titles = {
   agenda: "Agenda de Joaco",
   finanzas: "Finanzas",
   departamentos: "Departamentos",
-  catalogo: "Catálogo de Servicios"
+  catalogo: "Catálogo de Servicios",
+  chat: "Chat CEO"
 };
 
 function showSection(id) {
@@ -432,7 +526,7 @@ function showSection(id) {
     if (n.textContent.trim().includes(titles[id]?.split('/')[0]?.trim() || '---')) n.classList.add('active');
   });
   // Re-render section
-  const renders = { dashboard: renderDashboard, clientes: renderClientes, proyectos: renderProyectos, agenda: renderAgenda, finanzas: renderFinanzas, departamentos: renderDepartamentos, catalogo: renderCatalogo };
+  const renders = { dashboard: renderDashboard, clientes: renderClientes, proyectos: renderProyectos, agenda: renderAgenda, chat: renderChat, finanzas: renderFinanzas, departamentos: renderDepartamentos, catalogo: renderCatalogo };
   if (renders[id]) renders[id]();
   // Close mobile sidebar
   document.getElementById('sidebar').classList.remove('open');
@@ -744,8 +838,36 @@ function openModal(type, editId) {
     <div class="form-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveMovimiento()">Guardar</button></div>`;
   }
 
+  if (type === 'nueva-conversacion') {
+    html = `<h2>💬 Nueva Conversación</h2>
+    <div class="form-group"><label>Nombre del Contacto</label><input id="f-chat-nombre" placeholder="Ej: Juan Pérez"></div>
+    <div class="form-group"><label>Teléfono (con código país, sin +)</label><input id="f-chat-tel" placeholder="Ej: 542665123456"></div>
+    <div class="form-group"><label>Vincular a cliente (opcional)</label><select id="f-chat-cliente"><option value="">Sin vincular</option>${DB.clientes.map(c=>`<option value="${c.id}">${c.nombre} — ${c.empresa}</option>`).join('')}</select></div>
+    <div class="form-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveNuevaConversacion()">Crear</button></div>`;
+  }
+
   m.innerHTML = html;
   document.getElementById('modal-overlay').classList.add('show');
+}
+
+function saveNuevaConversacion() {
+  const nombre = document.getElementById('f-chat-nombre').value.trim();
+  const tel = document.getElementById('f-chat-tel').value.trim().replace(/[^0-9]/g,'');
+  const cliId = parseInt(document.getElementById('f-chat-cliente').value) || null;
+  if (!nombre || !tel) { toast('Nombre y teléfono son obligatorios','error'); return; }
+  if (chatConversaciones.find(c => c.telefono === tel)) { toast('Ya existe una conversación con ese número','error'); return; }
+  chatConversaciones.push({
+    id: chatConversaciones.length + 1,
+    telefono: tel, nombre, clienteId: cliId,
+    ultimoMsg: '', ultimoTime: '', unread: 0
+  });
+  chatMensajes[tel] = [];
+  saveChat();
+  closeModal();
+  openChat(tel);
+  renderConversaciones();
+  addTimeline(`Chat: nueva conversación con <strong>${nombre}</strong>`);
+  toast('Conversación creada','success');
 }
 
 function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
@@ -847,10 +969,373 @@ function toast(msg, type) {
 }
 
 // ============================================================
+// SUPABASE MANAGER — Cloud persistence with localStorage fallback
+// ============================================================
+const SUPABASE_CONFIG = {
+  url: localStorage.getItem('divinia_supabase_url') || '',
+  key: localStorage.getItem('divinia_supabase_key') || ''
+};
+let supabase = null;
+let supabaseReady = false;
+
+function initSupabase() {
+  if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.key && window.supabase_js) {
+    try {
+      supabase = window.supabase_js.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+      supabaseReady = true;
+      document.querySelector('#chat-wa-status .dot').className = 'dot online';
+      document.querySelector('#chat-wa-status span:nth-child(2)').innerHTML = 'Supabase: Conectado <span class="cerebro-badge" style="margin-left:8px">✓ Cloud</span>';
+      console.log('Supabase connected');
+    } catch(e) { console.warn('Supabase init error:', e); }
+  }
+}
+
+function showSupabaseConfig() {
+  const html = `<h2>⚙️ Configuración Cloud</h2>
+    <div class="form-group"><label>Supabase URL</label><input id="f-sb-url" value="${SUPABASE_CONFIG.url}" placeholder="https://xxxxx.supabase.co"></div>
+    <div class="form-group"><label>Supabase Anon Key</label><input id="f-sb-key" value="${SUPABASE_CONFIG.key}" placeholder="eyJhbGciOiJIUzI1NiIs..."></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-primary" onclick="saveSupabaseConfig()">💾 Guardar y Conectar</button>
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+    </div>
+    <div style="margin-top:16px;padding:12px;background:var(--bg3);border-radius:8px;font-size:11px;color:var(--text2)">
+      <strong>¿No tenés Supabase?</strong><br>
+      1. Creá cuenta gratis en <a href="https://supabase.com" target="_blank" style="color:var(--cyan)">supabase.com</a><br>
+      2. Nuevo proyecto → Settings → API<br>
+      3. Copiá URL y anon key acá
+    </div>`;
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function saveSupabaseConfig() {
+  const url = document.getElementById('f-sb-url').value.trim();
+  const key = document.getElementById('f-sb-key').value.trim();
+  if (!url || !key) { toast('Completá ambos campos','error'); return; }
+  localStorage.setItem('divinia_supabase_url', url);
+  localStorage.setItem('divinia_supabase_key', key);
+  SUPABASE_CONFIG.url = url;
+  SUPABASE_CONFIG.key = key;
+  initSupabase();
+  closeModal();
+  toast('Supabase configurado','success');
+}
+
+async function migrateToSupabase() {
+  if (!supabaseReady) return;
+  const localDB = loadDB();
+  for (const t of ['clientes','proyectos','tareas','movimientos','departamentos']) {
+    if (localDB[t]?.length) {
+      const { error } = await supabase.from(t).upsert(localDB[t]);
+      if (error) console.warn('Migration error for ' + t, error);
+    }
+  }
+  toast('Datos migrados a Supabase','success');
+  addTimeline('Datos migrados a Supabase Cloud');
+}
+
+// ============================================================
+// CEREBRO — Intent Detection & Smart Suggestions
+// ============================================================
+const Cerebro = {
+  patrones: {
+    cotizacion: /cotizaci[óo]n|precio|cu[áa]nto\s*(cuesta|sale|cobr)|presupuesto|tarifa/i,
+    propuesta: /propuesta|interesado|me\s*interesa|quiero\s*contratar/i,
+    confirmacion: /confirmo|listo|dale|ok|perfecto|de\s*acuerdo|trato\s*hecho/i,
+    soporte: /problema|error|no\s*funciona|ayuda|bug|falla|se\s*cayó/i,
+    saludo: /hola|buen[oa]s|buenas?\s*(tardes?|noches?|d[ií]as?)|qué?\s*tal/i,
+    urgente: /urgente|emergencia|ya\s*mismo|ahora|cuanto\s*antes/i
+  },
+
+  detectar(texto) {
+    for (const [intent, regex] of Object.entries(this.patrones)) {
+      if (regex.test(texto)) return intent;
+    }
+    return 'general';
+  },
+
+  sugerencias(intent) {
+    const templates = {
+      cotizacion: [
+        "Te paso nuestro catálogo de servicios. ¿Qué tipo de solución buscás?",
+        "Tenemos chatbots WhatsApp desde $150.000 y webs desde $100.000. ¿Qué necesitás?",
+        "¿Podemos agendar una videollamada para entender mejor tu necesidad?"
+      ],
+      propuesta: [
+        "¡Genial! Te preparo una propuesta formal esta semana.",
+        "Perfecto, te armo el presupuesto detallado con plazos y entregables.",
+        "Agendamos una reunión para definir alcance y cerrar?"
+      ],
+      confirmacion: [
+        "¡Excelente! Te envío el link de MercadoPago para el 50% de adelanto.",
+        "Perfecto, arrancamos. Te paso el cronograma del proyecto.",
+        "Genial, quedamos así. Mañana te mando el primer avance."
+      ],
+      soporte: [
+        "Entendido, lo reviso ahora mismo. ¿Me podés mandar un screenshot?",
+        "Lo estamos viendo. Te doy una solución en las próximas 2 horas.",
+        "Gracias por avisar, ya lo derivé al equipo técnico."
+      ],
+      saludo: [
+        "¡Hola! ¿En qué te puedo ayudar hoy?",
+        "Buenas, ¿cómo andás? ¿Necesitás algo de DIVINIA?",
+        "¡Hola! Soy Joaco de DIVINIA. ¿Qué necesitás?"
+      ],
+      urgente: [
+        "Lo veo ahora mismo, dame 10 minutos.",
+        "Entendido, es prioridad. Ya lo estamos resolviendo.",
+        "Lo paso como urgente al equipo. Te aviso apenas esté."
+      ],
+      general: [
+        "Gracias por tu mensaje. ¿En qué puedo ayudarte?",
+        "¡Hola! Contame más sobre lo que necesitás.",
+        "Recibido, te respondo a la brevedad."
+      ]
+    };
+    return templates[intent] || templates.general;
+  },
+
+  procesarMensaje(texto, telefono) {
+    const intent = this.detectar(texto);
+    const sugerencias = this.sugerencias(intent);
+    // Auto-create task for urgent or support
+    if (intent === 'urgente' || intent === 'soporte') {
+      const conv = chatConversaciones.find(c => c.telefono === telefono);
+      const nombre = conv?.nombre || telefono;
+      DB.tareas.push({
+        id: DB.nextId.tareas++,
+        texto: `⚡ ${intent === 'urgente' ? 'URGENTE' : 'SOPORTE'}: ${nombre} — "${texto.substring(0, 60)}..."`,
+        prioridad: 'alta',
+        categoria: intent === 'urgente' ? 'llamada' : 'deploy',
+        fecha: new Date().toISOString().split('T')[0],
+        done: false
+      });
+      saveDB(DB);
+      addTimeline(`Cerebro: tarea auto-creada para ${nombre} (${intent})`);
+    }
+    return { intent, sugerencias };
+  }
+};
+
+// ============================================================
+// CHAT SYSTEM — Conversations & Messages
+// ============================================================
+let chatConversaciones = [];
+let chatMensajes = {};
+let chatActivo = null;
+const CHAT_KEY = 'divinia_chat';
+
+function loadChat() {
+  const raw = localStorage.getItem(CHAT_KEY);
+  if (raw) {
+    const data = JSON.parse(raw);
+    chatConversaciones = data.conversaciones || [];
+    chatMensajes = data.mensajes || {};
+  }
+  if (!chatConversaciones.length) {
+    chatConversaciones = [
+      { id: 1, telefono: '542665000001', nombre: 'Ediro (Sec. Transporte)', clienteId: 1, ultimoMsg: 'Hola Joaco, ¿cómo viene TUBI?', ultimoTime: '2026-02-17 14:30', unread: 1 }
+    ];
+    chatMensajes['542665000001'] = [
+      { id: 1, tipo: 'recibido', texto: 'Hola Joaco, ¿cómo viene TUBI?', hora: '14:30', fecha: '2026-02-17' },
+      { id: 2, tipo: 'enviado', texto: 'Hola Ediro! Viene bien, estamos al 60%. Esta semana te muestro el avance.', hora: '14:35', fecha: '2026-02-17' },
+      { id: 3, tipo: 'recibido', texto: 'Perfecto, el viernes podemos?', hora: '14:37', fecha: '2026-02-17' }
+    ];
+  }
+}
+
+function saveChat() {
+  localStorage.setItem(CHAT_KEY, JSON.stringify({
+    conversaciones: chatConversaciones,
+    mensajes: chatMensajes
+  }));
+}
+
+let chatNextId = 100;
+
+function renderConversaciones() {
+  const el = document.getElementById('chat-conversations');
+  el.innerHTML = chatConversaciones.length ? chatConversaciones.sort((a,b) => (b.ultimoTime||'').localeCompare(a.ultimoTime||'')).map(c => {
+    const initials = (c.nombre || c.telefono).substring(0, 2).toUpperCase();
+    return `<div class="chat-contact ${chatActivo === c.telefono ? 'active' : ''}" onclick="openChat('${c.telefono}')">
+      <div class="chat-avatar">${initials}</div>
+      <div class="chat-contact-info">
+        <div class="chat-contact-name">${c.nombre || c.telefono}</div>
+        <div class="chat-contact-preview">${c.ultimoMsg || '—'}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="chat-contact-time">${(c.ultimoTime||'').split(' ')[1] || ''}</div>
+        ${c.unread ? `<div class="chat-contact-badge">${c.unread}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty-state"><span class="icon">💬</span>Sin conversaciones</div>';
+}
+
+function openChat(telefono) {
+  chatActivo = telefono;
+  const conv = chatConversaciones.find(c => c.telefono === telefono);
+  if (conv) conv.unread = 0;
+  saveChat();
+
+  document.getElementById('chat-empty').style.display = 'none';
+  document.getElementById('chat-active').style.display = 'flex';
+  document.getElementById('chat-contact-name').textContent = conv?.nombre || telefono;
+
+  const cli = conv?.clienteId ? DB.clientes.find(c => c.id === conv.clienteId) : null;
+  document.getElementById('chat-contact-status').textContent = cli ? `Cliente: ${cli.empresa}` : `+${telefono}`;
+
+  renderMensajes();
+  renderConversaciones();
+  document.getElementById('chat-input').focus();
+}
+
+function renderMensajes() {
+  if (!chatActivo) return;
+  const msgs = chatMensajes[chatActivo] || [];
+  const el = document.getElementById('chat-messages');
+  let lastDate = '';
+  el.innerHTML = msgs.map(m => {
+    let dateDiv = '';
+    if (m.fecha !== lastDate) {
+      lastDate = m.fecha;
+      dateDiv = `<div class="chat-date-divider"><span>${m.fecha}</span></div>`;
+    }
+    return `${dateDiv}<div class="chat-bubble-wrap ${m.tipo}">
+      <div class="chat-bubble ${m.tipo}">${m.texto}</div>
+      <span class="chat-bubble-time">${m.hora}${m.tipo === 'enviado' ? ' ✓✓' : ''}</span>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+  // Hide suggestions
+  document.getElementById('chat-suggestions').style.display = 'none';
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const texto = input.value.trim();
+  if (!texto || !chatActivo) return;
+
+  const now = new Date();
+  const hora = now.toTimeString().substring(0, 5);
+  const fecha = now.toISOString().split('T')[0];
+
+  if (!chatMensajes[chatActivo]) chatMensajes[chatActivo] = [];
+  chatMensajes[chatActivo].push({
+    id: chatNextId++, tipo: 'enviado', texto, hora, fecha
+  });
+
+  const conv = chatConversaciones.find(c => c.telefono === chatActivo);
+  if (conv) { conv.ultimoMsg = texto; conv.ultimoTime = `${fecha} ${hora}`; }
+
+  input.value = '';
+  saveChat();
+  renderMensajes();
+  renderConversaciones();
+
+  // Send via WhatsApp API if connected
+  if (supabaseReady) {
+    sendWhatsApp(chatActivo, texto);
+  }
+}
+
+function simulateReceive(telefono, texto) {
+  const now = new Date();
+  const hora = now.toTimeString().substring(0, 5);
+  const fecha = now.toISOString().split('T')[0];
+
+  if (!chatMensajes[telefono]) chatMensajes[telefono] = [];
+  chatMensajes[telefono].push({
+    id: chatNextId++, tipo: 'recibido', texto, hora, fecha
+  });
+
+  const conv = chatConversaciones.find(c => c.telefono === telefono);
+  if (conv) {
+    conv.ultimoMsg = texto;
+    conv.ultimoTime = `${fecha} ${hora}`;
+    if (chatActivo !== telefono) conv.unread = (conv.unread || 0) + 1;
+  }
+
+  // Cerebro processes
+  const result = Cerebro.procesarMensaje(texto, telefono);
+  if (chatActivo === telefono) {
+    showSugerencias(result.sugerencias);
+    renderMensajes();
+  }
+
+  saveChat();
+  renderConversaciones();
+  toast(`Nuevo mensaje de ${conv?.nombre || telefono}`, 'success');
+}
+
+function showSugerencias(sugerencias) {
+  const el = document.getElementById('chat-suggestions');
+  el.style.display = 'flex';
+  el.innerHTML = '<span style="font-size:10px;color:var(--text3);width:100%">🧠 Cerebro sugiere:</span>' +
+    sugerencias.map(s => `<div class="chat-suggestion" onclick="useSugerencia(this)">${s}</div>`).join('');
+}
+
+function useSugerencia(el) {
+  document.getElementById('chat-input').value = el.textContent;
+  document.getElementById('chat-suggestions').style.display = 'none';
+  document.getElementById('chat-input').focus();
+}
+
+async function sendWhatsApp(telefono, texto) {
+  try {
+    const resp = await fetch('/api/send-whatsapp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telefono, contenido: texto })
+    });
+    if (resp.ok) console.log('WhatsApp sent');
+    else console.warn('WhatsApp send failed');
+  } catch(e) { console.warn('WhatsApp API not available:', e.message); }
+}
+
+function openWhatsAppDirect() {
+  if (!chatActivo) return;
+  window.open(`https://wa.me/${chatActivo}`, '_blank');
+}
+
+function vincularClienteChat() {
+  if (!chatActivo) return;
+  const conv = chatConversaciones.find(c => c.telefono === chatActivo);
+  const options = DB.clientes.map(c => `<option value="${c.id}"${conv?.clienteId === c.id ? ' selected' : ''}>${c.nombre} — ${c.empresa}</option>`).join('');
+  const html = `<h2>🔗 Vincular a Cliente</h2>
+    <div class="form-group"><label>Cliente</label><select id="f-vincular-cli"><option value="">Sin vincular</option>${options}</select></div>
+    <button class="btn btn-primary" onclick="saveVinculacion()" style="margin-top:12px">Guardar</button>`;
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function saveVinculacion() {
+  const cliId = parseInt(document.getElementById('f-vincular-cli').value) || null;
+  const conv = chatConversaciones.find(c => c.telefono === chatActivo);
+  if (conv) { conv.clienteId = cliId; saveChat(); openChat(chatActivo); }
+  closeModal();
+  toast('Cliente vinculado', 'success');
+}
+
+function renderChat() {
+  loadChat();
+  renderConversaciones();
+  if (chatActivo) openChat(chatActivo);
+}
+
+// ============================================================
 // INIT
 // ============================================================
 document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('es-AR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+loadChat();
 renderDashboard();
+
+// Try to init Supabase if configured
+if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.key) {
+  const sbScript = document.createElement('script');
+  sbScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  sbScript.onload = () => { window.supabase_js = window.supabase; initSupabase(); };
+  document.head.appendChild(sbScript);
+}
 </script>
 </body>
 </html>
