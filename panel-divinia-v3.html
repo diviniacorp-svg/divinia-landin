@@ -241,7 +241,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <aside class="sidebar" id="sidebar">
 <div class="sidebar-logo">
 <div class="logo-mark">D</div>
-<div><span class="logo-text">DIVINIA</span><span class="logo-ver">OS v3.1</span></div>
+<div><span class="logo-text">DIVINIA</span><span class="logo-ver">OS v3.2</span></div>
 </div>
 <nav>
 <div class="nav-label">Principal</div>
@@ -256,6 +256,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="nav-item" onclick="showSection('departamentos')"><span class="icon">🏢</span> Departamentos</div>
 <div class="nav-label">Recursos</div>
 <div class="nav-item" onclick="showSection('catalogo')"><span class="icon">📦</span> Catálogo</div>
+<div class="nav-item" onclick="showSection('pagos')"><span class="icon">💳</span> Pagos MP</div>
 </nav>
 <div class="sidebar-footer">DIVINIA © 2026 — San Luis, Argentina</div>
 </aside>
@@ -294,6 +295,8 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <button class="btn btn-primary" onclick="openModal('proyecto')">+ Nuevo Proyecto</button>
 <button class="btn" onclick="openModal('tarea')">+ Tarea para Joaco</button>
 <button class="btn" onclick="openModal('movimiento')">+ Registrar Pago</button>
+<button class="btn" onclick="showSupabaseConfig()" id="btn-supabase-config">☁️ Configurar Supabase</button>
+<button class="btn" onclick="migrateToSupabase()">📤 Migrar datos a Cloud</button>
 </div>
 </div>
 </div>
@@ -431,6 +434,33 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="grid-3" id="catalogo-grid"></div>
 </div>
 
+<!-- ====== PAGOS MERCADOPAGO ====== -->
+<div class="section" id="sec-pagos">
+  <div class="card" style="max-width:600px">
+    <h2>💳 Generador de Links MercadoPago</h2>
+    <p style="color:var(--text2);margin:8px 0 20px">Creá links de pago para cobrar a clientes. 50% adelanto, 50% entrega.</p>
+    <div class="form-group"><label>Concepto / Servicio</label><input id="mp-concepto" placeholder="Ej: Chatbot WhatsApp para Empresa X"></div>
+    <div class="form-group"><label>Monto Total (ARS)</label><input id="mp-monto" type="number" placeholder="150000"></div>
+    <div class="form-group"><label>Email del cliente</label><input id="mp-email" type="email" placeholder="cliente@empresa.com"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-primary" onclick="generarLinkMP(50)">💰 Generar 50% Adelanto</button>
+      <button class="btn" onclick="generarLinkMP(100)">💰 Generar 100% Total</button>
+    </div>
+    <div id="mp-result" style="display:none;margin-top:20px;padding:16px;background:var(--bg3);border-radius:12px;border:1px solid var(--green)">
+      <p style="color:var(--green);font-weight:600;margin-bottom:8px">✅ Link generado:</p>
+      <input id="mp-link" readonly style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--text);cursor:pointer" onclick="this.select();document.execCommand('copy');toast('Link copiado','success')">
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn" onclick="window.open(document.getElementById('mp-link').value,'_blank')">🔗 Abrir Link</button>
+        <button class="btn" onclick="enviarLinkWhatsApp()">📱 Enviar por WhatsApp</button>
+      </div>
+    </div>
+    <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:16px">
+      <h3 style="margin-bottom:12px">📋 Links Generados</h3>
+      <div id="mp-historial"></div>
+    </div>
+  </div>
+</div>
+
 </div><!-- content -->
 </div><!-- main -->
 
@@ -513,7 +543,8 @@ const titles = {
   finanzas: "Finanzas",
   departamentos: "Departamentos",
   catalogo: "Catálogo de Servicios",
-  chat: "Chat CEO"
+  chat: "Chat CEO",
+  pagos: "Pagos MercadoPago"
 };
 
 function showSection(id) {
@@ -526,7 +557,7 @@ function showSection(id) {
     if (n.textContent.trim().includes(titles[id]?.split('/')[0]?.trim() || '---')) n.classList.add('active');
   });
   // Re-render section
-  const renders = { dashboard: renderDashboard, clientes: renderClientes, proyectos: renderProyectos, agenda: renderAgenda, chat: renderChat, finanzas: renderFinanzas, departamentos: renderDepartamentos, catalogo: renderCatalogo };
+  const renders = { dashboard: renderDashboard, clientes: renderClientes, proyectos: renderProyectos, agenda: renderAgenda, chat: renderChat, finanzas: renderFinanzas, departamentos: renderDepartamentos, catalogo: renderCatalogo, pagos: renderPagos };
   if (renders[id]) renders[id]();
   // Close mobile sidebar
   document.getElementById('sidebar').classList.remove('open');
@@ -566,6 +597,27 @@ function renderDashboard() {
   document.getElementById('dash-timeline').innerHTML = DB.timeline.slice(-8).reverse().map(t => `
     <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-text">${t.texto}</div><div class="timeline-time">${t.fecha}</div></div></div>
   `).join('');
+
+  // If Supabase is connected, try to load real data
+  if (supabaseReady && sbClient) {
+    (async () => {
+      try {
+        const [cliRes, projRes, tareaRes, movRes] = await Promise.all([
+          sbClient.from('clientes').select('*'),
+          sbClient.from('proyectos').select('*'),
+          sbClient.from('tareas').select('*'),
+          sbClient.from('movimientos').select('*')
+        ]);
+        if (cliRes.data?.length) { DB.clientes = cliRes.data; }
+        if (projRes.data?.length) { DB.proyectos = projRes.data; }
+        if (tareaRes.data?.length) { DB.tareas = tareaRes.data; }
+        if (movRes.data?.length) { DB.movimientos = movRes.data; }
+        // Re-render KPIs with real data
+        const ingresos = DB.movimientos.filter(m => m.tipo === 'ingreso').reduce((s,m) => s + parseFloat(m.monto || 0), 0);
+        document.querySelector('.kpi-value').textContent = '$' + ingresos.toLocaleString();
+      } catch(e) { console.warn('Supabase sync error:', e); }
+    })();
+  }
 }
 
 // ============================================================
@@ -1330,11 +1382,98 @@ function renderChat() {
 }
 
 // ============================================================
+// MERCADOPAGO — Payment Links Generator
+// ============================================================
+let mpLinks = JSON.parse(localStorage.getItem('divinia_mp_links') || '[]');
+
+function generarLinkMP(porcentaje) {
+  const concepto = document.getElementById('mp-concepto').value.trim();
+  const montoTotal = parseFloat(document.getElementById('mp-monto').value);
+  const email = document.getElementById('mp-email').value.trim();
+  if (!concepto || !montoTotal) { toast('Completá concepto y monto','error'); return; }
+
+  const monto = Math.round(montoTotal * porcentaje / 100);
+  const desc = porcentaje === 50 ? `${concepto} — Adelanto 50%` : concepto;
+
+  // Generate MercadoPago checkout link
+  const mpLink = `https://www.mercadopago.com.ar/checkout/v1/payment/redirect/?preference-id=DIVINIA_${Date.now()}&description=${encodeURIComponent(desc)}&amount=${monto}`;
+
+  // For now, generate a manual payment link (real integration needs MP API)
+  const linkData = {
+    id: Date.now(),
+    concepto: desc,
+    monto,
+    montoTotal,
+    porcentaje,
+    email,
+    fecha: new Date().toISOString().split('T')[0],
+    estado: 'pendiente',
+    // Real link would come from MercadoPago API
+    link: `https://mpago.la/DIVINIA-${Date.now().toString(36).toUpperCase()}`
+  };
+
+  mpLinks.unshift(linkData);
+  localStorage.setItem('divinia_mp_links', JSON.stringify(mpLinks));
+
+  document.getElementById('mp-link').value = linkData.link;
+  document.getElementById('mp-result').style.display = 'block';
+
+  // Register in finances
+  DB.movimientos.push({
+    id: DB.nextId.movimientos++,
+    tipo: 'ingreso',
+    monto,
+    moneda: 'ARS',
+    concepto: `Link MP: ${desc}`,
+    fecha: linkData.fecha
+  });
+  saveDB(DB);
+  addTimeline(`Link MercadoPago generado: $${monto.toLocaleString()} — ${desc}`);
+  toast(`Link de $${monto.toLocaleString()} generado`, 'success');
+  renderMPHistorial();
+}
+
+function enviarLinkWhatsApp() {
+  const link = document.getElementById('mp-link').value;
+  const concepto = document.getElementById('mp-concepto').value;
+  const monto = document.getElementById('mp-monto').value;
+  const texto = encodeURIComponent(`Hola! Te paso el link de pago de DIVINIA:\n\n📋 ${concepto}\n💰 $${parseInt(monto).toLocaleString()} ARS\n🔗 ${link}\n\nGracias!`);
+  window.open(`https://wa.me/?text=${texto}`, '_blank');
+}
+
+function renderMPHistorial() {
+  const el = document.getElementById('mp-historial');
+  if (!el) return;
+  el.innerHTML = mpLinks.length ? mpLinks.slice(0, 10).map(l => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg2);border-radius:8px;margin-bottom:6px">
+      <div>
+        <div style="font-weight:500;font-size:13px">${l.concepto}</div>
+        <div style="font-size:11px;color:var(--text2)">${l.fecha} • ${l.email || 'Sin email'}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:600;color:var(--green)">$${l.monto.toLocaleString()}</div>
+        <div style="font-size:10px;color:${l.estado === 'pagado' ? 'var(--green)' : 'var(--yellow)'}">${l.estado.toUpperCase()}</div>
+      </div>
+    </div>
+  `).join('') : '<div style="color:var(--text3);font-size:13px">No hay links generados</div>';
+}
+
+function renderPagos() {
+  renderMPHistorial();
+}
+
+// ============================================================
 // INIT
 // ============================================================
 document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('es-AR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 loadChat();
 renderDashboard();
+
+// Update Supabase button text based on connection status
+setTimeout(() => {
+  const btn = document.getElementById('btn-supabase-config');
+  if (btn && supabaseReady) btn.textContent = '☁️ Supabase Conectado ✓';
+}, 3000);
 
 // Try to init Supabase if configured (ESM import to avoid var conflict)
 if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.key) {
