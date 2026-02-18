@@ -72,12 +72,32 @@ export default async function handler(req, res) {
             });
           }
 
-          // Log cerebro event
+          // Log cerebro event y enrutar con CEO Router
           await supabase.from('eventos_cerebro').insert({
             tipo: 'mensaje_recibido',
             payload: { telefono, contenido, contactName, waId },
             procesado: false
           });
+
+          // Llamar al CEO Router para clasificar el mensaje
+          try {
+            const routerResponse = await fetch(
+              `${process.env.DOMAIN || 'https://api.divinia.ar'}/api/ceo-router`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  mensaje: contenido,
+                  telefono: telefono,
+                  contexto: 'whatsapp_incoming'
+                })
+              }
+            );
+            const routing = await routerResponse.json();
+            console.log(`Message routed to ${routing.data?.departamento}:`, contenido);
+          } catch (routerError) {
+            console.error('CEO Router error:', routerError);
+          }
 
           console.log(`Message from ${telefono}: ${contenido}`);
         }
