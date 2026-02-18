@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIVINIA OS v4.0 - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #8b5cf6;
+            --dark: #0f172a;
+            --dark-secondary: #1e293b;
+            --dark-tertiary: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%);
+            color: #e2e8f0;
+        }
+
+        .bg-dark { background-color: var(--dark); }
+        .bg-dark-secondary { background-color: var(--dark-secondary); }
+        .bg-dark-tertiary { background-color: var(--dark-tertiary); }
+
+        .text-primary { color: var(--primary); }
+        .border-primary { border-color: var(--primary); }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--dark-tertiary);
+            color: #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--dark-secondary) 0%, var(--dark) 100%);
+            border-right: 1px solid rgba(124, 58, 237, 0.2);
+            overflow-y: auto;
+            z-index: 40;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-280px);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            margin-top: 70px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+            min-height: calc(100vh - 70px);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(90deg, var(--dark-secondary) 0%, var(--dark) 100%);
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 50;
+        }
+
+        .topbar-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online { background-color: var(--success); }
+        .status-offline { background-color: var(--danger); }
+        .status-warning { background-color: var(--warning); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #cbd5e1;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(124, 58, 237, 0.1);
+            border-left-color: var(--primary);
+        }
+
+        .nav-item.active {
+            background-color: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .nav-item-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card {
+            background: var(--dark-secondary);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            border-color: rgba(124, 58, 237, 0.3);
+            box-shadow: 0 20px 50px rgba(124, 58, 237, 0.1);
+        }
+
+        .kpi-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0.5rem 0;
+        }
+
+        .kpi-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-success { background-color: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge-warning { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge-danger { background-color: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .badge-info { background-color: rgba(59, 130, 246, 0.2); color: var(--info); }
+        .badge-primary { background-color: rgba(124, 58, 237, 0.2); color: var(--primary); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--dark-secondary);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .input-field {
+            background: var(--dark-tertiary);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--dark-secondary);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.warning { border-left: 4px solid var(--warning); }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: var(--dark-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .chart-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 200px;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 100%;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bar:hover {
+            filter: brightness(1.2);
+            transform: scaleY(1.05);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .client-card {
+            background: var(--dark-tertiary);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .client-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .chat-message.sent {
+            flex-direction: row-reverse;
+        }
+
+        .chat-bubble {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            word-wrap: break-word;
+        }
+
+        .chat-message.received .chat-bubble {
+            background: var(--dark-tertiary);
+            color: #e2e8f0;
+            border-radius: 1rem 1rem 1rem 0.25rem;
+        }
+
+        .chat-message.sent .chat-bubble {
+            background: var(--primary);
+            color: white;
+            border-radius: 1rem 1rem 0.25rem 1rem;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .grid-6 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+
+        .kanban-column {
+            background: var(--dark-tertiary);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            min-height: 400px;
+        }
+
+        .kanban-header {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+
+        .kanban-item {
+            background: var(--dark-secondary);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            cursor: move;
+            transition: all 0.2s;
+        }
+
+        .kanban-item:hover {
+            border-color: var(--primary);
+        }
+
+        .agent-card {
+            background: var(--dark-tertiary);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .agent-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.15);
+        }
+
+        .agent-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        .agent-status.active { background-color: var(--success); }
+        .agent-status.inactive { background-color: #64748b; }
+
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 240px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .grid-2 { grid-template-columns: 1fr; }
+            .grid-3 { grid-template-columns: 1fr; }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-6 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .footer-stats {
+            background: linear-gradient(90deg, rgba(124, 58, 237, 0.1) 0%, transparent 100%);
+            border-top: 1px solid rgba(124, 58, 237, 0.1);
+            padding: 1rem 0;
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-button:hover {
+            color: #cbd5e1;
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .close-button:hover {
+            color: #e2e8f0;
+        }
+
+        .scroll-hide::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scroll-hide::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scroll-hide::-webkit-scrollbar-thumb {
+            background: rgba(124, 58, 237, 0.3);
+            border-radius: 4px;
+        }
+
+        .scroll-hide::-webkit-scrollbar-thumb:hover {
+            background: rgba(124, 58, 237, 0.5);
+        }
+    </style>
+</head>
+<body class="scroll-hide">
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="flex items-center gap-4">
+        <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+        <div class="topbar-brand">DIVINIA OS v4.0</div>
+    </div>
+    <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 text-sm">
+            <span class="status-indicator status-online"></span>
+            <span id="statusText">Online</span>
+        </div>
+        <div class="flex items-center gap-3 px-3 py-2 bg-dark-tertiary rounded">
+            <span class="text-sm font-semibold">J</span>
+        </div>
+    </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar scroll-hide" id="sidebar">
+    <div class="p-6 border-b border-purple-500 border-opacity-20">
+        <div class="text-lg font-bold text-primary mb-1">DIVINIA</div>
+        <div class="text-xs text-gray-400">Admin Command Center</div>
+    </div>
+
+    <nav class="mt-6">
+        <div class="nav-item active" onclick="showSection('dashboard')">
+            <span style="font-size: 1.25rem;">📊</span>
+            <span class="nav-item-text">Dashboard</span>
+        </div>
+        <div class="nav-item" onclick="showSection('ceo')">
+            <span style="font-size: 1.25rem;">🧠</span>
+            <span class="nav-item-text">CEO Brain</span>
+        </div>
+        <div class="nav-item" onclick="showSection('crm')">
+            <span style="font-size: 1.25rem;">👥</span>
+            <span class="nav-item-text">CRM Clientes</span>
+        </div>
+        <div class="nav-item" onclick="showSection('proyectos')">
+            <span style="font-size: 1.25rem;">💼</span>
+            <span class="nav-item-text">Proyectos</span>
+        </div>
+        <div class="nav-item" onclick="showSection('tareas')">
+            <span style="font-size: 1.25rem;">📋</span>
+            <span class="nav-item-text">Tareas</span>
+        </div>
+        <div class="nav-item" onclick="showSection('finanzas')">
+            <span style="font-size: 1.25rem;">💰</span>
+            <span class="nav-item-text">Finanzas</span>
+        </div>
+        <div class="nav-item" onclick="showSection('chat')">
+            <span style="font-size: 1.25rem;">💬</span>
+            <span class="nav-item-text">Chat CEO</span>
+        </div>
+        <div class="nav-item" onclick="showSection('pagos')">
+            <span style="font-size: 1.25rem;">💳</span>
+            <span class="nav-item-text">Pagos MP</span>
+        </div>
+        <div class="nav-item" onclick="showSection('agentes')">
+            <span style="font-size: 1.25rem;">🤖</span>
+            <span class="nav-item-text">Agentes</span>
+        </div>
+        <div class="nav-item" onclick="showSection('marketing')">
+            <span style="font-size: 1.25rem;">📢</span>
+            <span class="nav-item-text">Marketing</span>
+        </div>
+        <div class="nav-item" onclick="showSection('config')">
+            <span style="font-size: 1.25rem;">⚙️</span>
+            <span class="nav-item-text">Config</span>
+        </div>
+    </nav>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="mainContent">
+
+    <!-- DASHBOARD SECTION -->
+    <section id="dashboard" class="section active">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Dashboard</h1>
+            <div class="flex gap-2">
+                <button class="btn-primary" onclick="openNewClientModal()">+ Nuevo Cliente</button>
+                <button class="btn-primary" onclick="openNewTaskModal()">+ Nueva Tarea</button>
+                <button class="btn-primary" onclick="openPaymentLinkModal()">⚡ Link MP</button>
+            </div>
+        </div>
+
+        <!-- KPI GRID -->
+        <div class="grid-6" id="kpiGrid">
+            <!-- KPI cards will be rendered here -->
+        </div>
+
+        <!-- CHARTS & ACTIVITY -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+            <!-- REVENUE CHART -->
+            <div class="lg:col-span-2 card">
+                <h3 class="text-lg font-bold mb-6">Ingresos Últimos 6 Meses</h3>
+                <div class="flex items-end justify-between h-64 gap-2" id="revenueChart">
+                    <!-- Bar chart will be rendered -->
+                </div>
+            </div>
+
+            <!-- RECENT ACTIVITY -->
+            <div class="card">
+                <h3 class="text-lg font-bold mb-4">Actividad Reciente</h3>
+                <div id="activityTimeline">
+                    <!-- Timeline items will be rendered -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CEO BRAIN SECTION -->
+    <section id="ceo" class="section">
+        <h1 class="text-3xl font-bold mb-8">CEO Brain - Router IA</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- CHAT INTERFACE -->
+            <div class="lg:col-span-2">
+                <div class="card">
+                    <div class="flex gap-4 mb-6">
+                        <input type="text" id="ceoQuery" class="input-field flex-1" placeholder="Preguntale al CEO...">
+                        <button class="btn-primary" onclick="sendCEOQuery()">Enviar</button>
+                    </div>
+
+                    <div id="ceoChatArea" style="height: 400px; overflow-y: auto;" class="space-y-4">
+                        <div class="text-center text-gray-400 mt-20">
+                            Comenzá a hacer preguntas al CEO
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STATS PANEL -->
+            <div class="space-y-4">
+                <div class="card">
+                    <h4 class="text-sm font-bold text-primary mb-4">ESTADÍSTICAS</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-400">Queries hoy:</span>
+                            <span class="font-bold" id="queriesCount">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-400">Tiempo promedio:</span>
+                            <span class="font-bold" id="avgTime">0ms</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-400">Haiku usado:</span>
+                            <span class="font-bold" id="haikuCount">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-400">Sonnet usado:</span>
+                            <span class="font-bold" id="sonnetCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4 class="text-sm font-bold text-primary mb-4">INTENT DETECTADO</h4>
+                    <div id="intentPanel" class="space-y-2">
+                        <div class="text-xs text-gray-400">Esperando query...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4 class="text-sm font-bold text-primary mb-4">MEMORY</h4>
+                    <div id="memoryPanel" class="space-y-2 text-xs">
+                        <div class="text-gray-400">Sin contexto aún</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CRM SECTION -->
+    <section id="crm" class="section">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">CRM - Clientes</h1>
+            <button class="btn-primary" onclick="openNewClientModal()">+ Nuevo Cliente</button>
+        </div>
+
+        <!-- PIPELINE VISUAL -->
+        <div class="mb-8 p-6 bg-dark-secondary rounded-lg border border-purple-500 border-opacity-10">
+            <h3 class="text-lg font-bold mb-4">Pipeline de Ventas</h3>
+            <div class="flex justify-between items-center gap-4">
+                <div class="flex flex-col items-center">
+                    <div class="text-3xl font-bold text-primary" id="pipelineNuevo">0</div>
+                    <div class="text-xs text-gray-400 mt-1">NUEVO</div>
+                </div>
+                <div class="flex-1 h-1 bg-gradient-to-r from-purple-500 to-transparent"></div>
+                <div class="flex flex-col items-center">
+                    <div class="text-3xl font-bold text-info" id="pipelineContactado">0</div>
+                    <div class="text-xs text-gray-400 mt-1">CONTACTADO</div>
+                </div>
+                <div class="flex-1 h-1 bg-gradient-to-r from-blue-500 to-transparent"></div>
+                <div class="flex flex-col items-center">
+                    <div class="text-3xl font-bold text-warning" id="pipelinePropuesta">0</div>
+                    <div class="text-xs text-gray-400 mt-1">PROPUESTA</div>
+                </div>
+                <div class="flex-1 h-1 bg-gradient-to-r from-yellow-500 to-transparent"></div>
+                <div class="flex flex-col items-center">
+                    <div class="text-3xl font-bold text-purple-400" id="pipelineNegociacion">0</div>
+                    <div class="text-xs text-gray-400 mt-1">NEGOCIACIÓN</div>
+                </div>
+                <div class="flex-1 h-1 bg-gradient-to-r from-purple-400 to-transparent"></div>
+                <div class="flex flex-col items-center">
+                    <div class="text-3xl font-bold text-success" id="pipelineCerrado">0</div>
+                    <div class="text-xs text-gray-400 mt-1">CERRADO</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="flex gap-4 mb-6">
+            <input type="text" id="clientSearch" class="input-field flex-1 max-w-md" placeholder="Buscar cliente...">
+            <select id="statusFilter" class="input-field max-w-xs">
+                <option value="">Todos los estados</option>
+                <option value="nuevo">Nuevo</option>
+                <option value="contactado">Contactado</option>
+                <option value="propuesta">Propuesta</option>
+                <option value="negociacion">Negociación</option>
+                <option value="cerrado">Cerrado</option>
+            </select>
+        </div>
+
+        <!-- CLIENT LIST -->
+        <div class="grid-2" id="clientGrid">
+            <!-- Client cards will be rendered -->
+        </div>
+    </section>
+
+    <!-- PROYECTOS SECTION -->
+    <section id="proyectos" class="section">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Proyectos</h1>
+            <button class="btn-primary" onclick="openNewProjectModal()">+ Nuevo Proyecto</button>
+        </div>
+
+        <!-- KANBAN -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" id="kanbanBoard">
+            <!-- Kanban columns will be rendered -->
+        </div>
+    </section>
+
+    <!-- TAREAS SECTION -->
+    <section id="tareas" class="section">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Tareas</h1>
+            <div class="flex gap-2">
+                <button class="btn-secondary" onclick="toggleCalendarView()" id="calendarViewBtn">📅 Calendario</button>
+                <button class="btn-primary" onclick="openNewTaskModal()">+ Nueva Tarea</button>
+            </div>
+        </div>
+
+        <!-- QUICK ADD -->
+        <div class="card mb-6">
+            <div class="flex gap-2">
+                <input type="text" id="quickTaskInput" class="input-field flex-1" placeholder="Agregar tarea rápida...">
+                <button class="btn-primary" onclick="quickAddTask()">Agregar</button>
+            </div>
+        </div>
+
+        <!-- PRIORITY FILTERS -->
+        <div class="flex gap-2 mb-6">
+            <button class="tab-button active" onclick="filterTasksByPriority('todas')">Todas</button>
+            <button class="tab-button" onclick="filterTasksByPriority('alta')">🔴 Alta</button>
+            <button class="tab-button" onclick="filterTasksByPriority('media')">🟡 Media</button>
+            <button class="tab-button" onclick="filterTasksByPriority('baja')">⚪ Baja</button>
+        </div>
+
+        <!-- TASKS BY PRIORITY -->
+        <div class="space-y-6" id="tasksContainer">
+            <!-- Tasks will be rendered -->
+        </div>
+
+        <!-- CALENDAR VIEW -->
+        <div id="calendarView" style="display: none;" class="mt-8">
+            <div class="grid grid-cols-7 gap-2" id="calendarGrid">
+                <!-- Calendar grid will be rendered -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FINANZAS SECTION -->
+    <section id="finanzas" class="section">
+        <h1 class="text-3xl font-bold mb-8">Finanzas</h1>
+
+        <!-- SUMMARY CARDS -->
+        <div class="grid-3 mb-8">
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-2">INGRESOS</div>
+                <div class="text-3xl font-bold text-success" id="totalIncome">$0</div>
+                <div class="text-xs text-gray-500 mt-1">Este mes</div>
+            </div>
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-2">GASTOS</div>
+                <div class="text-3xl font-bold text-danger" id="totalExpense">$0</div>
+                <div class="text-xs text-gray-500 mt-1">Este mes</div>
+            </div>
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-2">BALANCE</div>
+                <div class="text-3xl font-bold text-primary" id="totalBalance">$0</div>
+                <div class="text-xs text-gray-500 mt-1">Neto</div>
+            </div>
+        </div>
+
+        <!-- MONTHLY CHART -->
+        <div class="card mb-8">
+            <h3 class="text-lg font-bold mb-6">Últimos 6 Meses</h3>
+            <div class="flex items-end justify-between h-64 gap-2" id="financeChart">
+                <!-- Finance chart will be rendered -->
+            </div>
+        </div>
+
+        <!-- QUICK ADD MOVEMENT -->
+        <div class="card mb-8">
+            <h3 class="text-lg font-bold mb-4">Nuevo Movimiento</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">Tipo</label>
+                    <select id="movementType" class="input-field">
+                        <option value="ingreso">Ingreso</option>
+                        <option value="gasto">Gasto</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Monto (ARS)</label>
+                    <input type="number" id="movementAmount" class="input-field" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Concepto</label>
+                    <input type="text" id="movementConcept" class="input-field" placeholder="Descripción">
+                </div>
+                <div class="form-group flex items-end">
+                    <button class="btn-primary w-full" onclick="addMovement()">Registrar Movimiento</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRANSACTIONS TABLE -->
+        <div class="card">
+            <h3 class="text-lg font-bold mb-4">Transacciones Recientes</h3>
+            <div class="space-y-2" id="transactionsList">
+                <!-- Transactions will be rendered -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CHAT CEO SECTION -->
+    <section id="chat" class="section">
+        <h1 class="text-3xl font-bold mb-8">Chat CEO</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[600px]">
+            <!-- CONVERSATION LIST -->
+            <div class="card overflow-y-auto">
+                <h3 class="text-sm font-bold text-primary mb-4">CONVERSACIONES</h3>
+                <div class="space-y-2" id="conversationList">
+                    <div class="text-xs text-gray-400">Sin conversaciones aún</div>
+                </div>
+            </div>
+
+            <!-- CHAT WINDOW -->
+            <div class="lg:col-span-3 card flex flex-col">
+                <h3 class="text-lg font-bold mb-4" id="chatTitle">Selecciona una conversación</h3>
+                <div id="chatWindow" class="flex-1 overflow-y-auto mb-4 space-y-2">
+                    <div class="text-center text-gray-400 mt-20">Sin mensajes</div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chatInput" class="input-field flex-1" placeholder="Escribe un mensaje...">
+                    <button class="btn-primary" onclick="sendChatMessage()">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGOS MP SECTION -->
+    <section id="pagos" class="section">
+        <h1 class="text-3xl font-bold mb-8">Pagos MercadoPago</h1>
+
+        <!-- LINK GENERATOR -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="card">
+                <h3 class="text-lg font-bold mb-6">Generar Link de Pago</h3>
+                <div class="space-y-4">
+                    <div class="form-group">
+                        <label class="form-label">Cliente</label>
+                        <select id="paymentClient" class="input-field">
+                            <option value="">Seleccionar cliente...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Proyecto</label>
+                        <select id="paymentProject" class="input-field">
+                            <option value="">Seleccionar proyecto...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Monto (ARS)</label>
+                        <input type="number" id="paymentAmount" class="input-field" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Porcentaje</label>
+                        <div class="flex gap-2">
+                            <button class="btn-secondary flex-1" onclick="setPaymentPercentage(50)">50%</button>
+                            <button class="btn-secondary flex-1" onclick="setPaymentPercentage(100)">100%</button>
+                        </div>
+                    </div>
+                    <button class="btn-primary w-full" onclick="generatePaymentLink()">🔗 Generar Link</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="text-lg font-bold mb-6">Link Generado</h3>
+                <div id="generatedLinkBox" class="bg-dark-tertiary p-4 rounded mb-4 hidden">
+                    <div class="text-xs text-gray-400 mb-2">Link MP:</div>
+                    <input type="text" id="generatedLink" class="input-field mb-4 text-xs" readonly>
+                    <div class="flex gap-2">
+                        <button class="btn-primary flex-1" onclick="copyLink()">📋 Copiar</button>
+                        <button class="btn-primary flex-1" onclick="shareViaWhatsapp()">💬 WhatsApp</button>
+                    </div>
+                </div>
+                <div id="qrPlaceholder" class="text-center text-gray-400 py-8">
+                    <div style="font-size: 4rem;">█ █ █</div>
+                    <div class="text-xs mt-2">QR code aquí</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAYMENT HISTORY -->
+        <div class="card">
+            <h3 class="text-lg font-bold mb-6">Historial de Pagos</h3>
+            <div class="space-y-2" id="paymentHistory">
+                <div class="text-gray-400 text-sm">Sin pagos registrados</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AGENTES SECTION -->
+    <section id="agentes" class="section">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Agentes IA</h1>
+            <div class="flex gap-2">
+                <select id="departmentFilter" class="input-field max-w-xs">
+                    <option value="">Todos los departamentos</option>
+                    <option value="01-IA">01 - IA & Automatizaciones</option>
+                    <option value="02-WEB">02 - Web & Apps</option>
+                    <option value="03-YOUTUBE">03 - YouTube</option>
+                    <option value="04-CONTENT">04 - Content Factory</option>
+                    <option value="05-CLIENTES">05 - Clientes & Servicios</option>
+                    <option value="06-AVATARES">06 - Avatares IA</option>
+                    <option value="07-LEGAL">07 - Legal & Compliance</option>
+                    <option value="08-SECURITY">08 - Ciberseguridad</option>
+                    <option value="09-FINANZAS">09 - Finanzas</option>
+                    <option value="10-RRHH">10 - RRHH Digital</option>
+                    <option value="11-INNOVACION">11 - Innovación</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- AGENTS GRID -->
+        <div class="grid-6" id="agentGrid">
+            <!-- Agent cards will be rendered -->
+        </div>
+
+        <!-- AGENT EXECUTOR -->
+        <div class="card mt-8">
+            <h3 class="text-lg font-bold mb-6">Ejecutar Agente</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="form-group">
+                    <label class="form-label">Selecciona Agente</label>
+                    <select id="executorAgent" class="input-field">
+                        <option value="">-- Seleccionar --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Input</label>
+                    <input type="text" id="executorInput" class="input-field" placeholder="Instrucción o data">
+                </div>
+                <div class="form-group flex items-end">
+                    <button class="btn-primary w-full" onclick="executeAgent()">▶ Ejecutar</button>
+                </div>
+            </div>
+            <div id="executorOutput" style="display: none;" class="mt-4 p-4 bg-dark-tertiary rounded text-sm">
+                <!-- Output will be displayed here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- MARKETING SECTION -->
+    <section id="marketing" class="section">
+        <h1 class="text-3xl font-bold mb-8">Marketing & Contenido</h1>
+
+        <!-- CALENDAR -->
+        <div class="card mb-8">
+            <h3 class="text-lg font-bold mb-4">Calendario de Contenido</h3>
+            <div class="grid grid-cols-7 gap-2" id="contentCalendar">
+                <!-- Calendar will be rendered -->
+            </div>
+        </div>
+
+        <!-- QUICK POST CREATOR -->
+        <div class="card">
+            <h3 class="text-lg font-bold mb-6">Crear Post</h3>
+            <div class="space-y-4">
+                <div class="form-group">
+                    <label class="form-label">Plataforma</label>
+                    <select id="postPlatform" class="input-field">
+                        <option value="">Seleccionar plataforma...</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="twitter">Twitter</option>
+                        <option value="tiktok">TikTok</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contenido</label>
+                    <textarea id="postContent" class="input-field" placeholder="Escribe el contenido del post..." rows="5"></textarea>
+                </div>
+                <button class="btn-primary w-full" onclick="schedulePost()">📅 Programar Post</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONFIG SECTION -->
+    <section id="config" class="section">
+        <h1 class="text-3xl font-bold mb-8">Configuración</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- SUPABASE CONFIG -->
+            <div class="card">
+                <h3 class="text-lg font-bold mb-6">Supabase</h3>
+                <div class="space-y-4">
+                    <div class="form-group">
+                        <label class="form-label">URL</label>
+                        <input type="text" id="supabaseUrl" class="input-field" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">API Key</label>
+                        <input type="password" id="supabaseKey" class="input-field" placeholder="••••••••">
+                    </div>
+                    <button class="btn-primary w-full" onclick="testSupabaseConnection()">🔌 Probar Conexión</button>
+                </div>
+            </div>
+
+            <!-- MERCADOPAGO CONFIG -->
+            <div class="card">
+                <h3 class="text-lg font-bold mb-6">MercadoPago</h3>
+                <div class="space-y-4">
+                    <div class="form-group">
+                        <label class="form-label">Access Token</label>
+                        <input type="password" id="mpToken" class="input-field" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">User ID</label>
+                        <input type="text" id="mpUserId" class="input-field" placeholder="••••••••">
+                    </div>
+                    <button class="btn-primary w-full" onclick="testMercadoPagoConnection()">🔌 Probar Conexión</button>
+                </div>
+            </div>
+
+            <!-- CLAUDE API CONFIG -->
+            <div class="card">
+                <h3 class="text-lg font-bold mb-6">Claude API</h3>
+                <div class="space-y-4">
+                    <div class="form-group">
+                        <label class="form-label">API Key</label>
+                        <input type="password" id="claudeApiKey" class="input-field" placeholder="••••••••">
+                    </div>
+                    <button class="btn-primary w-full" onclick="testClaudeConnection()">🔌 Probar Conexión</button>
+                </div>
+            </div>
+
+            <!-- WHATSAPP CONFIG -->
+            <div class="card">
+                <h3 class="text-lg font-bold mb-6">WhatsApp API</h3>
+                <div class="space-y-4">
+                    <div class="form-group">
+                        <label class="form-label">Business Account ID</label>
+                        <input type="text" id="whatsappId" class="input-field" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Access Token</label>
+                        <input type="password" id="whatsappToken" class="input-field" placeholder="••••••••">
+                    </div>
+                    <button class="btn-primary w-full" onclick="testWhatsappConnection()">🔌 Probar Conexión</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SYSTEM CONFIG -->
+        <div class="card mt-6">
+            <h3 class="text-lg font-bold mb-6">Configuración del Sistema</h3>
+            <div class="space-y-3" id="systemConfigList">
+                <!-- Config items will be rendered -->
+            </div>
+        </div>
+
+        <!-- DATA MANAGEMENT -->
+        <div class="card mt-6">
+            <h3 class="text-lg font-bold mb-6">Gestión de Datos</h3>
+            <div class="flex flex-wrap gap-2">
+                <button class="btn-secondary" onclick="exportData()">📥 Exportar Datos</button>
+                <button class="btn-secondary" onclick="importData()">📤 Importar Datos</button>
+                <button class="btn-secondary" onclick="clearLocalStorage()">🗑️ Limpiar Cache Local</button>
+                <button class="btn-danger" onclick="resetAllData()">⚠️ Reset Total</button>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- MODALS -->
+
+<!-- NEW CLIENT MODAL -->
+<div class="modal" id="newClientModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Nuevo Cliente</span>
+            <button class="close-button" onclick="closeModal('newClientModal')">×</button>
+        </div>
+        <div class="space-y-4">
+            <div class="form-group">
+                <label class="form-label">Nombre</label>
+                <input type="text" id="clientName" class="input-field">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Empresa</label>
+                <input type="text" id="clientCompany" class="input-field">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="clientEmail" class="input-field">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input type="tel" id="clientPhone" class="input-field">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Estado</label>
+                <select id="clientStatus" class="input-field">
+                    <option value="nuevo">Nuevo</option>
+                    <option value="contactado">Contactado</option>
+                    <option value="propuesta">Propuesta</option>
+                    <option value="negociacion">Negociación</option>
+                    <option value="cerrado">Cerrado</option>
+                </select>
+            </div>
+            <button class="btn-primary w-full" onclick="saveNewClient()">Crear Cliente</button>
+        </div>
+    </div>
+</div>
+
+<!-- NEW PROJECT MODAL -->
+<div class="modal" id="newProjectModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Nuevo Proyecto</span>
+            <button class="close-button" onclick="closeModal('newProjectModal')">×</button>
+        </div>
+        <div class="space-y-4">
+            <div class="form-group">
+                <label class="form-label">Nombre</label>
+                <input type="text" id="projectName" class="input-field">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cliente</label>
+                <select id="projectClient" class="input-field">
+                    <option value="">Seleccionar cliente...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Servicio</label>
+                <select id="projectService" class="input-field">
+                    <option value="">Seleccionar servicio...</option>
+                    <option value="chatbot">Chatbot WhatsApp</option>
+                    <option value="automatizacion">Automatización</option>
+                    <option value="landing">Landing Page</option>
+                    <option value="avatar">Avatar IA</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Precio (ARS)</label>
+                <input type="number" id="projectPrice" class="input-field">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Deadline</label>
+                <input type="date" id="projectDeadline" class="input-field">
+            </div>
+            <button class="btn-primary w-full" onclick="saveNewProject()">Crear Proyecto</button>
+        </div>
+    </div>
+</div>
+
+<!-- NEW TASK MODAL -->
+<div class="modal" id="newTaskModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Nueva Tarea</span>
+            <button class="close-button" onclick="closeModal('newTaskModal')">×</button>
+        </div>
+        <div class="space-y-4">
+            <div class="form-group">
+                <label class="form-label">Título</label>
+                <input type="text" id="taskTitle" class="input-field">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Descripción</label>
+                <textarea id="taskDesc" class="input-field" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Prioridad</label>
+                <select id="taskPriority" class="input-field">
+                    <option value="baja">Baja</option>
+                    <option value="media">Media</option>
+                    <option value="alta">Alta</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Deadline</label>
+                <input type="date" id="taskDeadline" class="input-field">
+            </div>
+            <button class="btn-primary w-full" onclick="saveNewTask()">Crear Tarea</button>
+        </div>
+    </div>
+</div>
+
+<!-- PAYMENT LINK MODAL -->
+<div class="modal" id="paymentLinkModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Generar Link MP</span>
+            <button class="close-button" onclick="closeModal('paymentLinkModal')">×</button>
+        </div>
+        <div class="space-y-4">
+            <div class="form-group">
+                <label class="form-label">Cliente</label>
+                <select id="quickPayClient" class="input-field">
+                    <option value="">Seleccionar...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Monto (ARS)</label>
+                <input type="number" id="quickPayAmount" class="input-field">
+            </div>
+            <button class="btn-primary w-full" onclick="quickGeneratePaymentLink()">Generar Link</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST NOTIFICATIONS -->
+<div id="toastContainer"></div>
+
+<script>
+    // ============================================
+    // GLOBAL APP STATE & CONFIG
+    // ============================================
+
+    const APP = {
+        version: '4.0',
+        section: 'dashboard',
+        supabase: null,
+        data: {
+            clientes: [],
+            proyectos: [],
+            tareas: [],
+            movimientos: [],
+            agentes: [],
+            conversaciones: [],
+            pagos: []
+        },
+        stats: {
+            queries: 0,
+            avgTime: 0,
+            haiku: 0,
+            sonnet: 0
+        }
+    };
+
+    const SUPABASE_CONFIG = {
+        url: localStorage.getItem('divinia_supabase_url') || '',
+        key: localStorage.getItem('divinia_supabase_key') || ''
+    };
+
+    const AGENTS_DATA = [
+        { id: 1, name: 'Dev Agentes', dept: '01-IA', role: 'Developer', model: 'sonnet', status: 'active' },
+        { id: 2, name: 'Integrador API', dept: '01-IA', role: 'Integration', model: 'haiku', status: 'active' },
+        { id: 3, name: 'Orquestador', dept: '01-IA', role: 'Orchestrator', model: 'sonnet', status: 'active' },
+        { id: 4, name: 'Optimizador Costos', dept: '01-IA', role: 'Optimizer', model: 'haiku', status: 'active' },
+        { id: 5, name: 'Frontend Dev', dept: '02-WEB', role: 'Developer', model: 'sonnet', status: 'active' },
+        { id: 6, name: 'Backend Dev', dept: '02-WEB', role: 'Developer', model: 'sonnet', status: 'active' },
+        { id: 7, name: 'Mobile Dev', dept: '02-WEB', role: 'Developer', model: 'sonnet', status: 'active' },
+        { id: 8, name: 'DevOps', dept: '02-WEB', role: 'Infrastructure', model: 'haiku', status: 'active' },
+        { id: 9, name: 'Guionista IA', dept: '03-YOUTUBE', role: 'Content', model: 'sonnet', status: 'active' },
+        { id: 10, name: 'Productor AV', dept: '03-YOUTUBE', role: 'Production', model: 'sonnet', status: 'active' },
+        { id: 11, name: 'SEO YouTube', dept: '03-YOUTUBE', role: 'SEO', model: 'haiku', status: 'active' },
+        { id: 12, name: 'Multicanal', dept: '03-YOUTUBE', role: 'Distribution', model: 'haiku', status: 'active' },
+        { id: 13, name: 'Copywriter IA', dept: '04-CONTENT', role: 'Content', model: 'sonnet', status: 'active' },
+        { id: 14, name: 'Diseñador IA', dept: '04-CONTENT', role: 'Design', model: 'sonnet', status: 'active' },
+        { id: 15, name: 'Video Creator', dept: '04-CONTENT', role: 'Production', model: 'sonnet', status: 'active' },
+        { id: 16, name: 'Voice Creator', dept: '04-CONTENT', role: 'Audio', model: 'haiku', status: 'active' },
+        { id: 17, name: 'CRM Manager', dept: '05-CLIENTES', role: 'Management', model: 'sonnet', status: 'active' },
+        { id: 18, name: 'Vendedor IA', dept: '05-CLIENTES', role: 'Sales', model: 'sonnet', status: 'active' },
+        { id: 19, name: 'Project Delivery', dept: '05-CLIENTES', role: 'PM', model: 'sonnet', status: 'active' },
+        { id: 20, name: 'Soporte Técnico', dept: '05-CLIENTES', role: 'Support', model: 'haiku', status: 'active' },
+        { id: 21, name: 'Diseñador Avatares', dept: '06-AVATARES', role: 'Design', model: 'sonnet', status: 'active' },
+        { id: 22, name: 'Voice Cloner', dept: '06-AVATARES', role: 'Audio', model: 'haiku', status: 'active' },
+        { id: 23, name: 'Integrador Video', dept: '06-AVATARES', role: 'Integration', model: 'sonnet', status: 'active' },
+        { id: 24, name: 'Vendedor Avatares', dept: '06-AVATARES', role: 'Sales', model: 'haiku', status: 'active' },
+        { id: 25, name: 'Contratos IA', dept: '07-LEGAL', role: 'Legal', model: 'sonnet', status: 'active' },
+        { id: 26, name: 'Compliance', dept: '07-LEGAL', role: 'Compliance', model: 'sonnet', status: 'active' },
+        { id: 27, name: 'IP Abogado', dept: '07-LEGAL', role: 'Legal', model: 'sonnet', status: 'active' },
+        { id: 28, name: 'Security Agent', dept: '08-SECURITY', role: 'Security', model: 'sonnet', status: 'active' },
+        { id: 29, name: 'Infra Manager', dept: '08-SECURITY', role: 'Infrastructure', model: 'haiku', status: 'active' },
+        { id: 30, name: 'Auditor', dept: '08-SECURITY', role: 'Auditing', model: 'haiku', status: 'active' },
+        { id: 31, name: 'Contador IA', dept: '09-FINANZAS', role: 'Accounting', model: 'sonnet', status: 'active' },
+        { id: 32, name: 'Fiscal IA', dept: '09-FINANZAS', role: 'Tax', model: 'sonnet', status: 'active' },
+        { id: 33, name: 'Cash Flow', dept: '09-FINANZAS', role: 'Analysis', model: 'haiku', status: 'active' },
+        { id: 34, name: 'Facturador', dept: '09-FINANZAS', role: 'Billing', model: 'haiku', status: 'active' },
+        { id: 35, name: 'Agent Creator', dept: '10-RRHH', role: 'HR', model: 'sonnet', status: 'active' },
+        { id: 36, name: 'Agent Trainer', dept: '10-RRHH', role: 'Training', model: 'sonnet', status: 'active' },
+        { id: 37, name: 'Documentador', dept: '10-RRHH', role: 'Documentation', model: 'haiku', status: 'active' }
+    ];
+
+    const MOCK_DATA = {
+        clientes: [
+            { id: 1, nombre: 'TechCorp SRL', empresa: 'TechCorp', email: 'contacto@techcorp.ar', telefono: '02652-123456', estado: 'cerrado', score: 95, ultimoContacto: '2025-02-15', total: 450000 },
+            { id: 2, nombre: 'Juan García', empresa: 'García Consultores', email: 'juan@garciaconsultores.ar', telefono: '02652-654321', estado: 'negociacion', score: 78, ultimoContacto: '2025-02-14', total: 250000 },
+            { id: 3, nombre: 'María López', empresa: 'MKT Solutions', email: 'maria@mktsolutions.ar', telefono: '02652-987654', estado: 'propuesta', score: 65, ultimoContacto: '2025-02-10', total: 0 },
+            { id: 4, nombre: 'Carlos Rodríguez', empresa: 'Prod. Rodríguez', email: 'carlos@prodriguez.ar', telefono: '02652-456789', estado: 'contactado', score: 45, ultimoContacto: '2025-02-08', total: 0 },
+            { id: 5, nombre: 'Sandra Pérez', empresa: 'SP Ventas', email: 'sandra@spventas.ar', telefono: '02652-789012', estado: 'nuevo', score: 20, ultimoContacto: '2025-02-01', total: 0 }
+        ],
+        proyectos: [
+            { id: 1, nombre: 'Chatbot WhatsApp', clienteId: 1, servicio: 'chatbot', precio: 250000, progreso: 85, estado: 'en_curso', deadline: '2025-03-01' },
+            { id: 2, nombre: 'Landing Page Tech', clienteId: 1, servicio: 'landing', precio: 150000, progreso: 100, estado: 'entregado', deadline: '2025-02-10' },
+            { id: 3, nombre: 'CRM Automatizado', clienteId: 2, servicio: 'automatizacion', precio: 350000, progreso: 45, estado: 'en_curso', deadline: '2025-03-15' },
+            { id: 4, nombre: 'Avatar IA Portavoz', clienteId: 2, servicio: 'avatar', precio: 300000, progreso: 20, estado: 'propuesta', deadline: '2025-04-01' }
+        ],
+        tareas: [
+            { id: 1, titulo: 'Revisar propuesta TechCorp', prioridad: 'alta', estado: false, deadline: '2025-02-18' },
+            { id: 2, titulo: 'Implementar API integración', prioridad: 'alta', estado: false, deadline: '2025-02-20' },
+            { id: 3, titulo: 'Testing chatbot v2', prioridad: 'media', estado: false, deadline: '2025-02-22' },
+            { id: 4, titulo: 'Documentar sistema', prioridad: 'baja', estado: true, deadline: '2025-02-25' }
+        ],
+        movimientos: [
+            { id: 1, tipo: 'ingreso', monto: 450000, concepto: 'Pago TechCorp - 50%', fecha: '2025-02-15' },
+            { id: 2, tipo: 'gasto', monto: 15000, concepto: 'Suscripción Supabase', fecha: '2025-02-14' },
+            { id: 3, tipo: 'ingreso', monto: 125000, concepto: 'Pago García Consultores', fecha: '2025-02-10' },
+            { id: 4, tipo: 'gasto', monto: 8000, concepto: 'Créditos Claude', fecha: '2025-02-09' }
+        ],
+        pagos: [
+            { id: 1, clienteId: 1, monto: 450000, estado: 'pagado', fecha: '2025-02-15', link: 'https://mp.me/divinia-1' },
+            { id: 2, clienteId: 2, monto: 175000, estado: 'pendiente', fecha: '2025-02-16', link: 'https://mp.me/divinia-2' }
+        ]
+    };
+
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+
+    function showSection(sectionId) {
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(s => s.classList.remove('active'));
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(n => n.classList.remove('active'));
+
+        document.getElementById(sectionId).classList.add('active');
+        event.target.closest('.nav-item').classList.add('active');
+        APP.section = sectionId;
+    }
+
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        document.getElementById('toastContainer').appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    function openNewClientModal() {
+        document.getElementById('clientName').value = '';
+        document.getElementById('clientCompany').value = '';
+        document.getElementById('clientEmail').value = '';
+        document.getElementById('clientPhone').value = '';
+        openModal('newClientModal');
+    }
+
+    function openNewProjectModal() {
+        document.getElementById('projectName').value = '';
+        document.getElementById('projectClient').value = '';
+        document.getElementById('projectService').value = '';
+        document.getElementById('projectPrice').value = '';
+        openModal('newProjectModal');
+    }
+
+    function openNewTaskModal() {
+        document.getElementById('taskTitle').value = '';
+        document.getElementById('taskDesc').value = '';
+        document.getElementById('taskPriority').value = 'media';
+        openModal('newTaskModal');
+    }
+
+    function openPaymentLinkModal() {
+        openModal('paymentLinkModal');
+        populateClientSelects();
+    }
+
+    // ============================================
+    // DATA MANAGEMENT
+    // ============================================
+
+    function loadData() {
+        // Try to load from localStorage first
+        const stored = localStorage.getItem('divinia_data');
+        if (stored) {
+            APP.data = JSON.parse(stored);
+        } else {
+            APP.data = JSON.parse(JSON.stringify(MOCK_DATA));
+            saveData();
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('divinia_data', JSON.stringify(APP.data));
+    }
+
+    function saveNewClient() {
+        const cliente = {
+            id: Math.max(...APP.data.clientes.map(c => c.id), 0) + 1,
+            nombre: document.getElementById('clientName').value,
+            empresa: document.getElementById('clientCompany').value,
+            email: document.getElementById('clientEmail').value,
+            telefono: document.getElementById('clientPhone').value,
+            estado: document.getElementById('clientStatus').value,
+            score: 0,
+            ultimoContacto: new Date().toISOString().split('T')[0],
+            total: 0
+        };
+
+        if (!cliente.nombre || !cliente.empresa || !cliente.email) {
+            showToast('Completa todos los campos requeridos', 'error');
+            return;
+        }
+
+        APP.data.clientes.push(cliente);
+        saveData();
+        closeModal('newClientModal');
+        renderCRM();
+        showToast('Cliente creado exitosamente', 'success');
+    }
+
+    function saveNewProject() {
+        const proyecto = {
+            id: Math.max(...APP.data.proyectos.map(p => p.id), 0) + 1,
+            nombre: document.getElementById('projectName').value,
+            clienteId: parseInt(document.getElementById('projectClient').value),
+            servicio: document.getElementById('projectService').value,
+            precio: parseInt(document.getElementById('projectPrice').value),
+            progreso: 0,
+            estado: 'propuesta',
+            deadline: document.getElementById('projectDeadline').value
+        };
+
+        if (!proyecto.nombre || !proyecto.clienteId || !proyecto.servicio || !proyecto.precio) {
+            showToast('Completa todos los campos requeridos', 'error');
+            return;
+        }
+
+        APP.data.proyectos.push(proyecto);
+        saveData();
+        closeModal('newProjectModal');
+        renderProyectos();
+        showToast('Proyecto creado exitosamente', 'success');
+    }
+
+    function saveNewTask() {
+        const tarea = {
+            id: Math.max(...APP.data.tareas.map(t => t.id), 0) + 1,
+            titulo: document.getElementById('taskTitle').value,
+            descripcion: document.getElementById('taskDesc').value,
+            prioridad: document.getElementById('taskPriority').value,
+            estado: false,
+            deadline: document.getElementById('taskDeadline').value
+        };
+
+        if (!tarea.titulo) {
+            showToast('Completa el título de la tarea', 'error');
+            return;
+        }
+
+        APP.data.tareas.push(tarea);
+        saveData();
+        closeModal('newTaskModal');
+        renderTareas();
+        showToast('Tarea creada exitosamente', 'success');
+    }
+
+    // ============================================
+    // RENDER FUNCTIONS
+    // ============================================
+
+    function renderDashboard() {
+        // KPI Cards
+        const totalClientes = APP.data.clientes.length;
+        const proyectosActivos = APP.data.proyectos.filter(p => p.estado === 'en_curso').length;
+        const ingresosTotal = APP.data.movimientos.filter(m => m.tipo === 'ingreso').reduce((sum, m) => sum + m.monto, 0);
+        const tareasCount = APP.data.tareas.filter(t => !t.estado).length;
+        const leadsNuevos = APP.data.clientes.filter(c => c.estado === 'nuevo').length;
+        const agentesActivos = AGENTS_DATA.filter(a => a.status === 'active').length;
+
+        const kpis = [
+            { label: 'Clientes Totales', value: totalClientes, icon: '👥' },
+            { label: 'Proyectos Activos', value: proyectosActivos, icon: '💼' },
+            { label: 'Ingresos Mes', value: `$${ingresosTotal.toLocaleString()}`, icon: '💰' },
+            { label: 'Tareas Pendientes', value: tareasCount, icon: '📋' },
+            { label: 'Leads Nuevos', value: leadsNuevos, icon: '🎯' },
+            { label: 'Agentes Activos', value: `${agentesActivos}/${AGENTS_DATA.length}`, icon: '🤖' }
+        ];
+
+        const kpiGrid = document.getElementById('kpiGrid');
+        kpiGrid.innerHTML = kpis.map(kpi => `
+            <div class="card kpi-card">
+                <div style="font-size: 2.5rem;">${kpi.icon}</div>
+                <div class="kpi-value">${kpi.value}</div>
+                <div class="kpi-label">${kpi.label}</div>
+            </div>
+        `).join('');
+
+        // Revenue Chart
+        const months = ['Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene'];
+        const revenues = [320000, 450000, 380000, 520000, 690000, 850000];
+        const maxRevenue = Math.max(...revenues);
+
+        const revenueChart = document.getElementById('revenueChart');
+        revenueChart.innerHTML = revenues.map((rev, idx) => {
+            const height = (rev / maxRevenue) * 100;
+            return `
+                <div class="chart-bar">
+                    <div class="bar" style="height: ${height}%;" title="${months[idx]}: $${rev.toLocaleString()}"></div>
+                    <span class="text-xs text-gray-400">${months[idx]}</span>
+                </div>
+            `;
+        }).join('');
+
+        // Activity Timeline
+        const activityTimeline = document.getElementById('activityTimeline');
+        const recentActivities = [
+            { action: 'Pago recibido de TechCorp', time: 'Hace 2 horas' },
+            { action: 'Proyecto García iniciado', time: 'Hace 1 día' },
+            { action: 'Nueva propuesta enviada', time: 'Hace 2 días' },
+            { action: 'Cliente MKT Solutions agregado', time: 'Hace 3 días' }
+        ];
+
+        activityTimeline.innerHTML = recentActivities.map(activity => `
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div>
+                    <div class="text-sm">${activity.action}</div>
+                    <div class="text-xs text-gray-400 mt-1">${activity.time}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderCRM() {
+        // Update pipeline
+        const states = ['nuevo', 'contactado', 'propuesta', 'negociacion', 'cerrado'];
+        states.forEach(state => {
+            const count = APP.data.clientes.filter(c => c.estado === state).length;
+            document.getElementById(`pipeline${state.charAt(0).toUpperCase() + state.slice(1)}`).textContent = count;
+        });
+
+        // Render client cards
+        const clientGrid = document.getElementById('clientGrid');
+        const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+
+        const filtered = APP.data.clientes.filter(cliente => {
+            const matchesSearch = cliente.nombre.toLowerCase().includes(searchTerm) ||
+                                 cliente.empresa.toLowerCase().includes(searchTerm);
+            const matchesStatus = !statusFilter || cliente.estado === statusFilter;
+            return matchesSearch && matchesStatus;
+        });
+
+        clientGrid.innerHTML = filtered.map(cliente => {
+            const scoreColor = cliente.score >= 80 ? 'badge-success' : cliente.score >= 50 ? 'badge-warning' : 'badge-danger';
+            return `
+                <div class="card client-card" onclick="viewClientDetails(${cliente.id})">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <div class="font-bold text-lg">${cliente.nombre}</div>
+                            <div class="text-sm text-gray-400">${cliente.empresa}</div>
+                        </div>
+                        <span class="badge ${scoreColor}">${cliente.score}</span>
+                    </div>
+                    <div class="text-xs text-gray-400 mb-3">
+                        <div>📧 ${cliente.email}</div>
+                        <div>📱 ${cliente.telefono}</div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="badge badge-primary">${cliente.estado.toUpperCase()}</span>
+                        <span class="text-xs text-gray-400">$${cliente.total.toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        if (filtered.length === 0) {
+            clientGrid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400">Sin resultados</div>';
+        }
+    }
+
+    function renderProyectos() {
+        const estados = ['propuesta', 'en_curso', 'revision', 'entregado', 'cobrado'];
+        const kanbanBoard = document.getElementById('kanbanBoard');
+
+        kanbanBoard.innerHTML = estados.map(estado => {
+            const proyectosEstado = APP.data.proyectos.filter(p => p.estado === estado);
+            const estadoLabel = {
+                'propuesta': 'Propuesta',
+                'en_curso': 'En Curso',
+                'revision': 'Revisión',
+                'entregado': 'Entregado',
+                'cobrado': 'Cobrado'
+            }[estado];
+
+            return `
+                <div class="kanban-column">
+                    <div class="kanban-header">${estadoLabel} (${proyectosEstado.length})</div>
+                    ${proyectosEstado.map(p => `
+                        <div class="kanban-item">
+                            <div class="font-bold text-sm">${p.nombre}</div>
+                            <div class="text-xs text-gray-400 mt-1">
+                                ${APP.data.clientes.find(c => c.id === p.clienteId)?.nombre || 'Sin cliente'}
+                            </div>
+                            <div class="progress-bar mt-2">
+                                <div class="progress-fill" style="width: ${p.progreso}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-400 mt-2">
+                                $${p.precio.toLocaleString()} • ${p.progreso}%
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderTareas() {
+        const prioridades = ['alta', 'media', 'baja'];
+        const tasksContainer = document.getElementById('tasksContainer');
+        const currentFilter = document.querySelector('.tab-button.active')?.textContent || 'Todas';
+
+        const sections = prioridades.map(prioridad => {
+            const tareasFiltradas = APP.data.tareas.filter(t => t.prioridad === prioridad);
+
+            return `
+                <div>
+                    <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                        ${prioridad === 'alta' ? '🔴' : prioridad === 'media' ? '🟡' : '⚪'}
+                        ${prioridad.toUpperCase()} (${tareasFiltradas.length})
+                    </h3>
+                    <div class="space-y-2">
+                        ${tareasFiltradas.map(t => `
+                            <div class="card flex items-start gap-4">
+                                <input type="checkbox" ${t.estado ? 'checked' : ''} onchange="toggleTask(${t.id})" class="mt-1">
+                                <div class="flex-1">
+                                    <div class="font-bold ${t.estado ? 'line-through text-gray-500' : ''}">${t.titulo}</div>
+                                    <div class="text-sm text-gray-400 mt-1">${t.descripcion || 'Sin descripción'}</div>
+                                    <div class="text-xs text-gray-500 mt-2">Deadline: ${t.deadline}</div>
+                                </div>
+                                <button class="btn-secondary text-xs px-2 py-1" onclick="deleteTask(${t.id})">×</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        tasksContainer.innerHTML = sections;
+    }
+
+    function renderFinanzas() {
+        const ingresos = APP.data.movimientos.filter(m => m.tipo === 'ingreso').reduce((sum, m) => sum + m.monto, 0);
+        const gastos = APP.data.movimientos.filter(m => m.tipo === 'gasto').reduce((sum, m) => sum + m.monto, 0);
+
+        document.getElementById('totalIncome').textContent = `$${ingresos.toLocaleString()}`;
+        document.getElementById('totalExpense').textContent = `$${gastos.toLocaleString()}`;
+        document.getElementById('totalBalance').textContent = `$${(ingresos - gastos).toLocaleString()}`;
+
+        // Finance chart
+        const months = ['Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene'];
+        const revenues = [320000, 450000, 380000, 520000, 690000, 850000];
+        const maxRevenue = Math.max(...revenues);
+
+        const financeChart = document.getElementById('financeChart');
+        financeChart.innerHTML = revenues.map((rev, idx) => {
+            const height = (rev / maxRevenue) * 100;
+            return `
+                <div class="chart-bar">
+                    <div class="bar" style="height: ${height}%;" title="${months[idx]}: $${rev.toLocaleString()}"></div>
+                    <span class="text-xs text-gray-400">${months[idx]}</span>
+                </div>
+            `;
+        }).join('');
+
+        // Transactions
+        const transactionsList = document.getElementById('transactionsList');
+        transactionsList.innerHTML = APP.data.movimientos.map(m => `
+            <div class="flex justify-between items-center p-3 bg-dark-tertiary rounded">
+                <div>
+                    <div class="text-sm font-bold">${m.concepto}</div>
+                    <div class="text-xs text-gray-400">${m.fecha}</div>
+                </div>
+                <div class="text-sm font-bold ${m.tipo === 'ingreso' ? 'text-success' : 'text-danger'}">
+                    ${m.tipo === 'ingreso' ? '+' : '-'}$${m.monto.toLocaleString()}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderAgentes() {
+        const deptFilter = document.getElementById('departmentFilter').value;
+        const filtered = deptFilter ? AGENTS_DATA.filter(a => a.dept === deptFilter) : AGENTS_DATA;
+
+        const agentGrid = document.getElementById('agentGrid');
+        agentGrid.innerHTML = filtered.map(agent => `
+            <div class="card agent-card">
+                <div class="font-bold text-sm">${agent.name}</div>
+                <div class="text-xs text-gray-400 mt-1">${agent.role}</div>
+                <div class="flex justify-between items-center mt-2">
+                    <span class="badge ${agent.model === 'haiku' ? 'badge-info' : 'badge-warning'} text-xs">
+                        ${agent.model.toUpperCase()}
+                    </span>
+                    <span class="agent-status ${agent.status}"></span>
+                </div>
+            </div>
+        `).join('');
+
+        // Populate executor dropdown
+        const executorSelect = document.getElementById('executorAgent');
+        executorSelect.innerHTML = '<option value="">-- Seleccionar --</option>' + filtered.map(a =>
+            `<option value="${a.id}">${a.name}</option>`
+        ).join('');
+    }
+
+    function populateClientSelects() {
+        const selects = [
+            'projectClient', 'paymentClient', 'quickPayClient'
+        ];
+
+        selects.forEach(selectId => {
+            const select = document.getElementById(selectId);
+            if (select) {
+                select.innerHTML = '<option value="">Seleccionar cliente...</option>' +
+                    APP.data.clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+            }
+        });
+
+        // Project select
+        const projectSelect = document.getElementById('paymentProject');
+        if (projectSelect) {
+            projectSelect.innerHTML = '<option value="">Seleccionar proyecto...</option>' +
+                APP.data.proyectos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        }
+    }
+
+    // ============================================
+    // TASK FUNCTIONS
+    // ============================================
+
+    function toggleTask(id) {
+        const tarea = APP.data.tareas.find(t => t.id === id);
+        if (tarea) {
+            tarea.estado = !tarea.estado;
+            saveData();
+            renderTareas();
+        }
+    }
+
+    function deleteTask(id) {
+        APP.data.tareas = APP.data.tareas.filter(t => t.id !== id);
+        saveData();
+        renderTareas();
+        showToast('Tarea eliminada', 'success');
+    }
+
+    function filterTasksByPriority(priority) {
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        renderTareas();
+    }
+
+    function quickAddTask() {
+        const input = document.getElementById('quickTaskInput');
+        if (!input.value.trim()) {
+            showToast('Escribe una tarea', 'error');
+            return;
+        }
+
+        const tarea = {
+            id: Math.max(...APP.data.tareas.map(t => t.id), 0) + 1,
+            titulo: input.value,
+            descripcion: '',
+            prioridad: 'media',
+            estado: false,
+            deadline: ''
+        };
+
+        APP.data.tareas.push(tarea);
+        saveData();
+        input.value = '';
+        renderTareas();
+        showToast('Tarea agregada', 'success');
+    }
+
+    function toggleCalendarView() {
+        const calendarView = document.getElementById('calendarView');
+        calendarView.style.display = calendarView.style.display === 'none' ? 'grid' : 'none';
+    }
+
+    // ============================================
+    // FINANCE FUNCTIONS
+    // ============================================
+
+    function addMovement() {
+        const tipo = document.getElementById('movementType').value;
+        const monto = parseInt(document.getElementById('movementAmount').value);
+        const concepto = document.getElementById('movementConcept').value;
+
+        if (!monto || !concepto) {
+            showToast('Completa todos los campos', 'error');
+            return;
+        }
+
+        const movimiento = {
+            id: Math.max(...APP.data.movimientos.map(m => m.id), 0) + 1,
+            tipo,
+            monto,
+            concepto,
+            fecha: new Date().toISOString().split('T')[0]
+        };
+
+        APP.data.movimientos.push(movimiento);
+        saveData();
+        document.getElementById('movementAmount').value = '';
+        document.getElementById('movementConcept').value = '';
+        renderFinanzas();
+        showToast('Movimiento registrado', 'success');
+    }
+
+    // ============================================
+    // PAYMENT FUNCTIONS
+    // ============================================
+
+    function generatePaymentLink() {
+        const monto = document.getElementById('paymentAmount').value;
+        const clientId = document.getElementById('paymentClient').value;
+
+        if (!monto || !clientId) {
+            showToast('Completa monto y cliente', 'error');
+            return;
+        }
+
+        const cliente = APP.data.clientes.find(c => c.id === parseInt(clientId));
+        const link = `https://mp.me/divinia-${Date.now()}`;
+
+        document.getElementById('generatedLinkBox').classList.remove('hidden');
+        document.getElementById('generatedLink').value = link;
+
+        const pago = {
+            id: Math.max(...APP.data.pagos.map(p => p.id), 0) + 1,
+            clienteId: parseInt(clientId),
+            monto: parseInt(monto),
+            estado: 'pendiente',
+            fecha: new Date().toISOString().split('T')[0],
+            link
+        };
+
+        APP.data.pagos.push(pago);
+        saveData();
+        renderPaymentHistory();
+        showToast('Link generado', 'success');
+    }
+
+    function quickGeneratePaymentLink() {
+        const monto = document.getElementById('quickPayAmount').value;
+        const clientId = document.getElementById('quickPayClient').value;
+
+        if (!monto || !clientId) {
+            showToast('Completa monto y cliente', 'error');
+            return;
+        }
+
+        document.getElementById('paymentAmount').value = monto;
+        document.getElementById('paymentClient').value = clientId;
+        closeModal('paymentLinkModal');
+        showSection('pagos');
+    }
+
+    function setPaymentPercentage(percent) {
+        const projectId = document.getElementById('paymentProject').value;
+        if (!projectId) {
+            showToast('Selecciona un proyecto', 'error');
+            return;
+        }
+
+        const proyecto = APP.data.proyectos.find(p => p.id === parseInt(projectId));
+        const amount = (proyecto.precio * percent) / 100;
+        document.getElementById('paymentAmount').value = amount;
+    }
+
+    function copyLink() {
+        const link = document.getElementById('generatedLink');
+        navigator.clipboard.writeText(link.value);
+        showToast('Link copiado', 'success');
+    }
+
+    function shareViaWhatsapp() {
+        const link = document.getElementById('generatedLink').value;
+        const mensaje = encodeURIComponent(`Hola! 👋 Aquí está tu link de pago: ${link}`);
+        window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+    }
+
+    function renderPaymentHistory() {
+        const paymentHistory = document.getElementById('paymentHistory');
+        if (APP.data.pagos.length === 0) {
+            paymentHistory.innerHTML = '<div class="text-gray-400 text-sm">Sin pagos registrados</div>';
+            return;
+        }
+
+        paymentHistory.innerHTML = APP.data.pagos.map(pago => {
+            const cliente = APP.data.clientes.find(c => c.id === pago.clienteId);
+            const statusBadge = {
+                'pendiente': 'badge-warning',
+                'pagado': 'badge-success',
+                'vencido': 'badge-danger'
+            }[pago.estado];
+
+            return `
+                <div class="flex justify-between items-center p-3 bg-dark-tertiary rounded">
+                    <div>
+                        <div class="text-sm font-bold">${cliente?.nombre || 'Cliente desconocido'}</div>
+                        <div class="text-xs text-gray-400">${pago.fecha}</div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-sm font-bold">$${pago.monto.toLocaleString()}</div>
+                        <span class="badge ${statusBadge}">${pago.estado.toUpperCase()}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ============================================
+    // CEO & CHAT FUNCTIONS
+    // ============================================
+
+    function sendCEOQuery() {
+        const query = document.getElementById('ceoQuery').value;
+        if (!query.trim()) return;
+
+        const chatArea = document.getElementById('ceoChatArea');
+        const timestamp = new Date().toLocaleTimeString('es-AR');
+
+        // Add user message
+        const userMsg = document.createElement('div');
+        userMsg.className = 'chat-message sent';
+        userMsg.innerHTML = `
+            <div class="chat-bubble">${query}</div>
+            <div class="text-xs text-gray-500">${timestamp}</div>
+        `;
+        chatArea.appendChild(userMsg);
+
+        // Clear input
+        document.getElementById('ceoQuery').value = '';
+
+        // Simulate AI response
+        setTimeout(() => {
+            const intents = [
+                { intent: 'sales', dept: '05-CLIENTES', response: 'Revisando pipeline de ventas... Hay 2 propuestas pendientes.' },
+                { intent: 'projects', dept: '05-CLIENTES', response: 'Reportando estado de proyectos: 4 activos, 1 en revisión.' },
+                { intent: 'finance', dept: '09-FINANZAS', response: 'Balance actual: $827,000 ARS. Ingresos: $995,000. Gastos: $168,000.' },
+                { intent: 'tasks', dept: 'N/A', response: 'Tareas pendientes: 4 de alta prioridad que requieren atención.' },
+                { intent: 'agents', dept: '10-RRHH', response: 'Todos los 37 agentes están activos y disponibles.' }
+            ];
+
+            const selectedIntent = intents[Math.floor(Math.random() * intents.length)];
+
+            // Update stats
+            APP.stats.queries++;
+            APP.stats.haiku++;
+            document.getElementById('queriesCount').textContent = APP.stats.queries;
+            document.getElementById('haikuCount').textContent = APP.stats.haiku;
+
+            // Update intent display
+            document.getElementById('intentPanel').innerHTML = `
+                <div class="bg-dark-tertiary p-2 rounded text-xs">
+                    <div class="text-gray-400">Intent: <span class="text-primary">${selectedIntent.intent.toUpperCase()}</span></div>
+                    <div class="text-gray-400 mt-1">Routed to: <span class="text-primary">${selectedIntent.dept}</span></div>
+                </div>
+            `;
+
+            // Add AI response
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'chat-message received';
+            aiMsg.innerHTML = `
+                <div class="chat-bubble">${selectedIntent.response}</div>
+                <div class="text-xs text-gray-500">${new Date().toLocaleTimeString('es-AR')}</div>
+            `;
+            chatArea.appendChild(aiMsg);
+
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }, 800);
+
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        if (!input.value.trim()) return;
+
+        const chatWindow = document.getElementById('chatWindow');
+        const msg = document.createElement('div');
+        msg.className = 'chat-message sent';
+        msg.innerHTML = `<div class="chat-bubble">${input.value}</div>`;
+        chatWindow.appendChild(msg);
+
+        input.value = '';
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+
+        setTimeout(() => {
+            const response = document.createElement('div');
+            response.className = 'chat-message received';
+            response.innerHTML = `<div class="chat-bubble">Mensaje recibido ✓</div>`;
+            chatWindow.appendChild(response);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }, 500);
+    }
+
+    // ============================================
+    // AGENT FUNCTIONS
+    // ============================================
+
+    function executeAgent() {
+        const agentId = document.getElementById('executorAgent').value;
+        const input = document.getElementById('executorInput').value;
+
+        if (!agentId || !input) {
+            showToast('Selecciona agente y escribe input', 'error');
+            return;
+        }
+
+        const agent = AGENTS_DATA.find(a => a.id === parseInt(agentId));
+        const output = document.getElementById('executorOutput');
+
+        output.innerHTML = `<div class="animate-pulse">▌ Ejecutando ${agent.name}...</div>`;
+        output.style.display = 'block';
+
+        setTimeout(() => {
+            output.innerHTML = `
+                <div class="text-xs">
+                    <div class="text-gray-400">Agente: <span class="text-primary">${agent.name}</span></div>
+                    <div class="text-gray-400">Modelo: <span class="text-primary">${agent.model.toUpperCase()}</span></div>
+                    <div class="text-gray-400 mt-2">Input procesado: <span class="text-gray-300">"${input}"</span></div>
+                    <div class="text-success mt-2">✓ Ejecución completada exitosamente</div>
+                </div>
+            `;
+        }, 1500);
+
+        showToast('Agente ejecutado', 'success');
+    }
+
+    // ============================================
+    // CONFIG FUNCTIONS
+    // ============================================
+
+    function testSupabaseConnection() {
+        const url = document.getElementById('supabaseUrl').value;
+        const key = document.getElementById('supabaseKey').value;
+
+        if (!url || !key) {
+            showToast('Completa URL y Key', 'error');
+            return;
+        }
+
+        localStorage.setItem('divinia_supabase_url', url);
+        localStorage.setItem('divinia_supabase_key', key);
+        showToast('Conexión Supabase guardada', 'success');
+    }
+
+    function testMercadoPagoConnection() {
+        const token = document.getElementById('mpToken').value;
+        const userId = document.getElementById('mpUserId').value;
+
+        if (!token || !userId) {
+            showToast('Completa todos los campos', 'error');
+            return;
+        }
+
+        localStorage.setItem('divinia_mp_token', token);
+        localStorage.setItem('divinia_mp_userid', userId);
+        showToast('Conexión MercadoPago guardada', 'success');
+    }
+
+    function testClaudeConnection() {
+        const key = document.getElementById('claudeApiKey').value;
+
+        if (!key) {
+            showToast('Ingresa API Key de Claude', 'error');
+            return;
+        }
+
+        localStorage.setItem('divinia_claude_key', key);
+        showToast('API Key de Claude guardada', 'success');
+    }
+
+    function testWhatsappConnection() {
+        const id = document.getElementById('whatsappId').value;
+        const token = document.getElementById('whatsappToken').value;
+
+        if (!id || !token) {
+            showToast('Completa todos los campos', 'error');
+            return;
+        }
+
+        localStorage.setItem('divinia_whatsapp_id', id);
+        localStorage.setItem('divinia_whatsapp_token', token);
+        showToast('Configuración WhatsApp guardada', 'success');
+    }
+
+    function exportData() {
+        const dataStr = JSON.stringify(APP.data, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `divinia-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        showToast('Datos exportados', 'success');
+    }
+
+    function importData() {
+        showToast('Función de importación disponible pronto', 'warning');
+    }
+
+    function clearLocalStorage() {
+        if (confirm('¿Estás seguro? Se eliminarán todos los datos locales.')) {
+            localStorage.removeItem('divinia_data');
+            showToast('Cache local limpiado', 'success');
+        }
+    }
+
+    function resetAllData() {
+        if (confirm('¿RESET TOTAL? Esto eliminará TODO. ¿Estás SEGURO?')) {
+            localStorage.clear();
+            APP.data = JSON.parse(JSON.stringify(MOCK_DATA));
+            saveData();
+            renderDashboard();
+            showToast('Sistema reseteado a estado inicial', 'success');
+        }
+    }
+
+    function viewClientDetails(clientId) {
+        console.log('Viewing client:', clientId);
+        showToast('Detalles del cliente (función en desarrollo)', 'info');
+    }
+
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+
+    function schedulePost() {
+        const platform = document.getElementById('postPlatform').value;
+        const content = document.getElementById('postContent').value;
+
+        if (!platform || !content) {
+            showToast('Completa plataforma y contenido', 'error');
+            return;
+        }
+
+        showToast('Post programado exitosamente', 'success');
+        document.getElementById('postContent').value = '';
+        document.getElementById('postPlatform').value = '';
+    }
+
+    // ============================================
+    // SIDEBAR TOGGLE
+    // ============================================
+
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    });
+
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+
+    document.getElementById('clientSearch').addEventListener('keyup', renderCRM);
+    document.getElementById('statusFilter').addEventListener('change', renderCRM);
+    document.getElementById('departmentFilter').addEventListener('change', renderAgentes);
+
+    // Close modals on background click
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+
+    function init() {
+        loadData();
+        renderDashboard();
+        renderCRM();
+        renderProyectos();
+        renderTareas();
+        renderFinanzas();
+        renderAgentes();
+        populateClientSelects();
+        renderPaymentHistory();
+
+        // Set active navigation
+        document.querySelector('.nav-item').classList.add('active');
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+</script>
+
+</body>
+</html>
